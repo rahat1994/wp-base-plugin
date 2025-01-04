@@ -1,0 +1,11 @@
+{
+  "resources/admin/main.js": {
+    "file": "js/main.js",
+    "name": "main",
+    "src": "resources/admin/main.js",
+    "isEntry": true,
+    "css": [
+      "css/main.css"
+    ]
+  }
+}
