@@ -1,0 +1,15 @@
+{
+    "name": "rahat/wp-base-plugin",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Rahat Baksh",
+            "email": "rahat392@gmail.com"
+        }
+    ],
+    "require": {}
+}
