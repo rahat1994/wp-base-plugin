@@ -16,9 +16,11 @@ define('PLUGIN_CONST_VERSION', '1.0.0');
 define('PLUGIN_CONST_DEVELOPMENT', false);
 
 require_once(PLUGIN_CONST_DIR . 'vendor/autoload.php');
+require_once(PLUGIN_CONST_DIR . 'bootstrap/ServiceContainer.php');
 
 
 use App\Common\LoadAssets;
+use App\Interfaces\AssetsLoaderInterface;
 
 class WpBasePlugin
 {
@@ -40,12 +42,7 @@ class WpBasePlugin
 
     public function activatePlugin()
     {
-        register_activation_hook(__FILE__, function ($newWorkWide) {
-            // require_once(PLUGIN_CONST_DIR . 'includes/Classes/Activator.php');
-            // $activator = new \PluginClassName\Classes\Activator();
-            // $activator->migrateDatabases($newWorkWide);
-            error_log('Plugin activated');
-        });
+        register_activation_hook(__FILE__, function ($newWorkWide) {});
     }
 
     public function renderMenu()
@@ -79,7 +76,9 @@ class WpBasePlugin
 
     public function renderAdminPage()
     {
-        $loadAssets = new LoadAssets();
+        $container = ServiceContainer::getInstance()->getContainer();
+
+        $loadAssets = $container->get(AssetsLoaderInterface::class);
         $loadAssets->admin();
 
         $translatable = apply_filters('wp-base-plugin/frontend_translatable_strings', array(

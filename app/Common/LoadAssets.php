@@ -2,7 +2,9 @@
 
 namespace App\Common;
 
-class LoadAssets
+use App\Interfaces\AssetsLoaderInterface;
+
+class LoadAssets implements AssetsLoaderInterface
 {
     public function admin()
     {
