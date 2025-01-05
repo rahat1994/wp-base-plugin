@@ -2,7 +2,7 @@
 
 namespace App\Common;
 
-use App\Interfaces\AssetsLoaderInterface;
+use App\Interfaces\Commons\AssetsLoaderInterface;
 
 class LoadAssets implements AssetsLoaderInterface
 {

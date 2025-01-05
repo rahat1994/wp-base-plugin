@@ -13,23 +13,32 @@
 define('PLUGIN_CONST_URL', plugin_dir_url(__FILE__));
 define('PLUGIN_CONST_DIR', plugin_dir_path(__FILE__));
 define('PLUGIN_CONST_VERSION', '1.0.0');
-define('PLUGIN_CONST_DEVELOPMENT', false);
+define('PLUGIN_CONST_DEVELOPMENT', true);
 
 require_once(PLUGIN_CONST_DIR . 'vendor/autoload.php');
-require_once(PLUGIN_CONST_DIR . 'bootstrap/ServiceContainer.php');
 
-
+use App\Common\AjaxHandler;
 use App\Common\LoadAssets;
-use App\Interfaces\AssetsLoaderInterface;
+use App\Interfaces\Commons\ApiHandlerInterface;
+use App\Interfaces\Commons\AssetsLoaderInterface;
+use DI\Container;
 
 class WpBasePlugin
 {
+
+    private Container $container;
+
+    public function __construct()
+    {
+        $this->container = ServiceContainer::getInstance()->getContainer();
+    }
 
     public function boot()
     {
         $this->activatePlugin();
         $this->registerHooks();
         $this->registerShortCodes();
+        $this->registerApiRoutes();
         $this->renderMenu();
     }
 
@@ -43,6 +52,14 @@ class WpBasePlugin
     public function activatePlugin()
     {
         register_activation_hook(__FILE__, function ($newWorkWide) {});
+    }
+
+    public function registerApiRoutes()
+    {
+        add_action('rest_api_init', function () {
+            $api = $this->container->get(AjaxHandler::class);
+            $api->boot('wp_base_plugin');
+        });
     }
 
     public function renderMenu()
@@ -76,9 +93,7 @@ class WpBasePlugin
 
     public function renderAdminPage()
     {
-        $container = ServiceContainer::getInstance()->getContainer();
-
-        $loadAssets = $container->get(AssetsLoaderInterface::class);
+        $loadAssets = $this->container->get(LoadAssets::class);
         $loadAssets->admin();
 
         $translatable = apply_filters('wp-base-plugin/frontend_translatable_strings', array(
