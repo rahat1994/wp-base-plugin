@@ -26,11 +26,13 @@ use DI\Container;
 class WpBasePlugin
 {
 
-    private Container $container;
-
-    public function __construct()
+    public AjaxHandler $apiHandler;
+    public LoadAssets $assetsLoader;
+    public array $CPTS = [];
+    public function __construct(AjaxHandler $apiHandler, LoadAssets $assetsLoader)
     {
-        $this->container = ServiceContainer::getInstance()->getContainer();
+        $this->apiHandler = $apiHandler;
+        $this->assetsLoader = $assetsLoader;
     }
 
     public function boot()
@@ -39,7 +41,14 @@ class WpBasePlugin
         $this->registerHooks();
         $this->registerShortCodes();
         $this->registerApiRoutes();
+        $this->registerCPT();
         $this->renderMenu();
+    }
+
+    public function registerCPT(){
+        foreach($this->CPTS as $cpt){
+            $cpt->boot();
+        }
     }
 
     public function registerHooks()
@@ -57,8 +66,7 @@ class WpBasePlugin
     public function registerApiRoutes()
     {
         add_action('rest_api_init', function () {
-            $api = $this->container->get(AjaxHandler::class);
-            $api->boot('wp_base_plugin');
+            $this->apiHandler->boot('wp_base_plugin');
         });
     }
 
@@ -93,8 +101,7 @@ class WpBasePlugin
 
     public function renderAdminPage()
     {
-        $loadAssets = $this->container->get(LoadAssets::class);
-        $loadAssets->admin();
+        $this->assetsLoader->admin();
 
         $translatable = apply_filters('wp-base-plugin/frontend_translatable_strings', array(
             'hello' => __('Hello', 'pluginslug'),
@@ -118,4 +125,6 @@ class WpBasePlugin
     }
 }
 
-(new WpBasePlugin())->boot();
+$container = ServiceContainer::getInstance()->getContainer();
+$wpBasePlugin  = $container->get(WpBasePlugin::class);
+$wpBasePlugin->boot();
