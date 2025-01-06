@@ -4,6 +4,7 @@ namespace App\Shortcodes;
 
 use App\Validators\RegexValidator;
 use App\PlatformClients\RedditClient;
+use App\Interfaces\ShortCodes\ShortcodeInterface;
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -12,7 +13,7 @@ if (!defined('ABSPATH')) {
  * Ajax Handler Class
  * @since 1.0.0
  */
-class FeedShortCode
+class FeedShortCode implements ShortcodeInterface
 {
     public RedditClient $redditClient;
     public array $validators;

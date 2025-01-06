@@ -6,6 +6,7 @@ use App\Common\Router;
 use App\CPT\FeedCPT;
 use App\Interfaces\Commons\ApiHandlerInterface;
 use App\Interfaces\Commons\AssetsLoaderInterface;
+use App\Shortcodes\FeedShortCode;
 use App\Validators\RegexValidator;
 use App\Validators\UrlValidator;
 use DI\Container;
@@ -23,7 +24,9 @@ class ServiceContainer
             AssetsLoaderInterface::class => DI\autowire(LoadAssets::class),
             ApiHandlerInterface::class => DI\autowire(AjaxHandler::class),
             Router::class => DI\autowire(Router::class),
-            WpBasePlugin::class => DI\autowire(WpBasePlugin::class)->property('CPTS', self::getsCPTS()),
+            WpBasePlugin::class => DI\autowire(WpBasePlugin::class)
+                                    ->property('CPTS', self::getCPTS())
+                                    ->property('shortCodes', self::getShortCodes()),
             FeedCPT::class => DI\autowire(FeedCPT::class),
             UrlValidator::class => DI\autowire(UrlValidator::class),
             RegexValidator::class => DI\autowire(RegexValidator::class),
@@ -32,9 +35,20 @@ class ServiceContainer
         $this->container = $containerBuilder->build();
     }
 
-    public static function getsCPTS(){
+    // public function pluginBoot()
+    // {
+    //     $this->container->get(WpBasePlugin::class)->boot();
+    // }
+
+    public static function getCPTS(){
         return [
             DI\get(FeedCPT::class)
+        ];
+    }
+
+    public static function getShortCodes(){
+        return [
+            DI\get(FeedShortCode::class)
         ];
     }
 

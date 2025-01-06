@@ -29,6 +29,7 @@ class WpBasePlugin
     public AjaxHandler $apiHandler;
     public LoadAssets $assetsLoader;
     public array $CPTS = [];
+    public array $shortCodes = [];
     public function __construct(AjaxHandler $apiHandler, LoadAssets $assetsLoader)
     {
         $this->apiHandler = $apiHandler;
@@ -50,13 +51,16 @@ class WpBasePlugin
             $cpt->boot();
         }
     }
+    public function registerShortCodes() {
+        foreach($this->shortCodes as $shortCode){
+            $shortCode->boot();
+        }
+    }
 
     public function registerHooks()
     {
         add_action('init', array($this, 'loadTextDomain'));
     }
-
-    public function registerShortCodes() {}
 
     public function activatePlugin()
     {
