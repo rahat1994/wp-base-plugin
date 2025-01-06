@@ -1,23 +1,13 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import NewComponent from './components/NewComponent.vue'
-
-const vitelogo = wpbaseplugin.url + '/public/vite.svg'
-const vuelogo = wpbaseplugin.url + '/resources/assets/vue.svg'
+import { Button } from '../../src/components/ui/button'
 </script>
 
 <template>
   <div>
-    <div>
-      <a href="https://vitejs.dev" target="_blank">
-        <img :src="vitelogo" class="logo" alt="Vite logo" />
-      </a>
-      <a href="https://vuejs.org/" target="_blank">
-        <img :src="vuelogo" class="logo vue" alt="Vue logo" />
-      </a>
-    </div>
-    <HelloWorld msg="Vite + Vue" />
-    <NewComponent />
+     <Button>Click me</Button>
+     <Button variant="destructive">Click me</Button>
+     <Button variant="outline">Click me</Button>
+     <Button variant="secondary">Click me</Button>
   </div>
 </template>
 
