@@ -28,8 +28,9 @@ class WpBasePlugin
 
     public AjaxHandler $apiHandler;
     public LoadAssets $assetsLoader;
-    public array $CPTS = [];
-    public array $shortCodes = [];
+    public array $CPTS;
+    public array $shortCodes;
+    public array $settingsPages;
     public function __construct(AjaxHandler $apiHandler, LoadAssets $assetsLoader)
     {
         $this->apiHandler = $apiHandler;
@@ -41,6 +42,7 @@ class WpBasePlugin
         $this->activatePlugin();
         $this->registerHooks();
         $this->registerShortCodes();
+        $this->registerSettingsPages();
         $this->registerApiRoutes();
         $this->registerCPT();
         $this->renderMenu();
@@ -54,6 +56,12 @@ class WpBasePlugin
     public function registerShortCodes() {
         foreach($this->shortCodes as $shortCode){
             $shortCode->boot();
+        }
+    }
+
+    public function registerSettingsPages() {
+        foreach($this->settingsPages as $page){
+            $page->boot();
         }
     }
 

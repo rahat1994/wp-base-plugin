@@ -6,6 +6,7 @@ use App\Common\Router;
 use App\CPT\FeedCPT;
 use App\Interfaces\Commons\ApiHandlerInterface;
 use App\Interfaces\Commons\AssetsLoaderInterface;
+use App\SettingsPage\WPBaseSettingsPage;
 use App\Shortcodes\FeedShortCode;
 use App\Validators\RegexValidator;
 use App\Validators\UrlValidator;
@@ -26,18 +27,29 @@ class ServiceContainer
             Router::class => DI\autowire(Router::class),
             WpBasePlugin::class => DI\autowire(WpBasePlugin::class)
                                     ->property('CPTS', self::getCPTS())
-                                    ->property('shortCodes', self::getShortCodes()),
+                                    ->property('shortCodes', self::getShortCodes())
+                                    ->property('settingsPages', self::getSettingsPages()),
             FeedCPT::class => DI\autowire(FeedCPT::class),
             UrlValidator::class => DI\autowire(UrlValidator::class),
             RegexValidator::class => DI\autowire(RegexValidator::class),
+            FeedShortCode::class => DI\autowire(FeedShortCode::class),
+            WPBaseSettingsPage::class => DI\autowire(WpBaseSettingsPage::class),
+
         ])->build();
     }
+
+    
 
     // public function pluginBoot()
     // {
     //     $this->container->get(WpBasePlugin::class)->boot();
     // }
 
+    public static function getSettingsPages(){
+        return [
+            DI\get(WPBaseSettingsPage::class)
+        ];
+    }
     public static function getCPTS(){
         return [
             DI\get(FeedCPT::class)

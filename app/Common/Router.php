@@ -26,7 +26,7 @@ class Router
         $router = new static;
         
         include $file;
-        
+
         return $router;
     }
 
@@ -68,6 +68,10 @@ class Router
         $validRoutes = in_array($uri, $this->routeNames);
 
         if (array_key_exists($uri, $this->routes[$requestType]) && $validRoutes) {
+
+            if(is_callable($this->routes[$requestType][$uri])) {
+                return call_user_func($this->routes[$requestType][$uri]);
+            }
 
             $action = explode('@', $this->routes[$requestType][$uri]);
 
