@@ -11,35 +11,38 @@ if (!defined('ABSPATH')) {
 
 class FeedCPT implements CPTInterface
 {
-    public UrlValidator $urlValidator;
-	public function __construct(UrlValidator $urlValidator){
-        $this->urlValidator = $urlValidator;
-    }
-	
-    
+	public UrlValidator $urlValidator;
+	public function __construct(UrlValidator $urlValidator)
+	{
+		$this->urlValidator = $urlValidator;
+	}
+
+
 	public function boot()
 	{
 		add_action('init', array($this, 'register_feed_post_type'));
 		add_action('add_meta_boxes', array($this, 'add_meta_box'));
 		add_action('save_post',      array($this, 'save'));
-        add_filter('manage_subreddit_feed_posts_columns', array($this, 'addShortCodeColumn'));
-        add_action('manage_subreddit_feed_posts_custom_column' , array($this, 'product_custom_column_values'), 10, 2 );
+		add_filter('manage_subreddit_feed_posts_columns', array($this, 'addShortCodeColumn'));
+		add_action('manage_subreddit_feed_posts_custom_column', array($this, 'product_custom_column_values'), 10, 2);
 	}
 
-    public function addShortCodeColumn($columns){
+	public function addShortCodeColumn($columns)
+	{
 
-        return array_merge($columns, array('shortcode' => __('Shortcode','subreddit-rss')));
-    }
+		return array_merge($columns, array('shortcode' => __('Shortcode', 'subreddit-rss')));
+	}
 
-    public function product_custom_column_values($column, $post_id){
-        $post_id = (int) $post_id;
+	public function product_custom_column_values($column, $post_id)
+	{
+		$post_id = (int) $post_id;
 
-        switch ( $column ) {
-            case 'shortcode' 	:
-                echo "[wprb-subreddit-feed feed=".esc_html( $post_id )."]";
-            break;
-        }
-    }
+		switch ($column) {
+			case 'shortcode':
+				echo "[wprb-subreddit-feed feed=" . esc_html($post_id) . "]";
+				break;
+		}
+	}
 
 	public function register_feed_post_type()
 	{

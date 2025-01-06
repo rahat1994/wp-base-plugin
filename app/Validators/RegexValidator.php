@@ -14,24 +14,21 @@ class RegexValidator
 
     public function validate(string $value, string $pattern = "/^https:\/\/www\.reddit\.com\/r\/[a-zA-Z0-9_-]+$/", string $message = ''): bool
     {
-        error_log('this is the value: ' . $value);
-        error_log(preg_match($pattern, $value));
         if (preg_match($pattern, $value)) {
             return true;
         }
 
-        if(is_admin()){
+        if (is_admin()) {
             set_transient('my_meta_box_error', 'The custom field cannot be empty.', 30);
             add_action('admin_notices', array($this, 'addAdminNotice'), 10);
         }
-    
+
         return false;
     }
-    
+
 
     public function addAdminNotice()
     {
-        error_log('this is an eror');
         $message = get_transient('my_meta_box_error');
         if ($message) {
             echo '<div class="notice notice-error is-dismissible"><p>' . esc_html($message) . '</p></div>';
