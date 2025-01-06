@@ -20,9 +20,9 @@ class ServiceContainer
     private final function __construct()
     {
         $containerBuilder = new ContainerBuilder();
-        $containerBuilder->addDefinitions([
+        $this->container = $containerBuilder->addDefinitions([
             AssetsLoaderInterface::class => DI\autowire(LoadAssets::class),
-            ApiHandlerInterface::class => DI\autowire(AjaxHandler::class),
+            ApiHandlerInterface::class => DI\autowire(AjaxHandler::class)->property('routesFile', PLUGIN_CONST_DIR . '/routes/routes.php'),
             Router::class => DI\autowire(Router::class),
             WpBasePlugin::class => DI\autowire(WpBasePlugin::class)
                                     ->property('CPTS', self::getCPTS())
@@ -30,9 +30,7 @@ class ServiceContainer
             FeedCPT::class => DI\autowire(FeedCPT::class),
             UrlValidator::class => DI\autowire(UrlValidator::class),
             RegexValidator::class => DI\autowire(RegexValidator::class),
-        ]);
-
-        $this->container = $containerBuilder->build();
+        ])->build();
     }
 
     // public function pluginBoot()

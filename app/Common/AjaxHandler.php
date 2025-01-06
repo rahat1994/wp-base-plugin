@@ -5,15 +5,18 @@ namespace App\Common;
 use App\Common\Request;
 use App\Common\Router;
 use App\Interfaces\Commons\ApiHandlerInterface;
-use ServiceContainer;
 
 class AjaxHandler implements ApiHandlerInterface
 {
-    public function __construct(public Router $router) {}
+    public Router $router;
+    public string $routesFile = PLUGIN_CONST_DIR . 'routes/routes.php';
+    public function __construct(Router $router) {
+        $this->router = $router;
+    }
     /**
      * AjaxHandler constructor.
      */
-    public function boot($apiNamespace)
+    public function boot($apiNamespace = 'wp_base_plugin')
     {
         add_action('wp_ajax_' . $apiNamespace, [$this, 'handleRequest']);
     }
@@ -21,7 +24,7 @@ class AjaxHandler implements ApiHandlerInterface
     public function handleRequest()
     {
         $this->verify($_REQUEST);
-        $this->router->direct(Request::ajaxRoute(), Request::method());
+        $this->router->load($this->routesFile)->direct(Request::ajaxRoute(), Request::method());
     }
 
     public function getAccessRole()
@@ -38,7 +41,7 @@ class AjaxHandler implements ApiHandlerInterface
             return;
         }
 
-        if (!wp_verify_nonce($request['nonce'], 'dlct-nonce')) {
+        if (!wp_verify_nonce($request['nonce'], 'wp-base-plugin-nonce')) {
             wp_send_json_error(['message' => 'Error: Nonce error!']);
         }
     }

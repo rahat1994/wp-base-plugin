@@ -6,13 +6,6 @@ class Router
 {
 
     /**
-     * The single instance of the class.
-     *
-     * @var Router
-     */
-    private static $instance = null;
-
-    /**
      * All registered routes.
      *
      * @var array
@@ -23,17 +16,18 @@ class Router
     ];
     public $routeNames = [];
 
-    /**
-     * Get the single instance of the class.
+     /**
+     * Load a user's routes file.
      *
-     * @return Router
+     * @param string $file
      */
-    public static function getInstance()
+    public static function load($file)
     {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance;
+        $router = new static;
+        
+        include $file;
+        
+        return $router;
     }
 
     /**

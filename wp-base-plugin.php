@@ -69,9 +69,9 @@ class WpBasePlugin
 
     public function registerApiRoutes()
     {
-        add_action('rest_api_init', function () {
-            $this->apiHandler->boot('wp_base_plugin');
-        });
+        
+        $this->apiHandler->boot();
+        
     }
 
     public function renderMenu()
@@ -115,10 +115,12 @@ class WpBasePlugin
             'url' => PLUGIN_CONST_URL,
             'assets_url' => PLUGIN_CONST_URL . 'assets/',
             'ajaxurl' => admin_url('admin-ajax.php'),
+            'action'        => 'wp_base_plugin',
+            'nonce'         => wp_create_nonce('wp-base-plugin-nonce'),
             'i18n' => $translatable
         ));
 
-        wp_localize_script('wp-base-plugin-script-boot', 'wpbaseplugin', $pluginlowercase);
+        wp_localize_script('wp-base-plugin-script', 'wpbaseplugin', $pluginlowercase);
 
         echo '<div id="app"></div>';
     }

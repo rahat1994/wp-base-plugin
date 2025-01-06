@@ -1,17 +1,32 @@
 <script setup>
 import { ref } from 'vue'
+import {useFetch, $post, $get} from "../request";
+
 defineProps({
   msg: String,
 })
 
 const count = ref(0)
 
-function doAjax(){
+function doAjax() {
+// console.console.log('doAjax');
 
-  console.log(wpbaseplugin.ajaxurl + '/wp-json/wp/v2');
-  fetch(wpbaseplugin.url + '/wp-json/wp/v2')
-  .then(response => response.json())
-  .then(json => console.log(json))
+return new Promise(async (resolve) => {
+    try {
+        // state.isLoading = true;
+        // state.error = false;
+        const args = {
+            route: 'test'
+        };
+        const {data, error: fetchError} = await $get(args);
+    } catch (err) {
+      console.log(err);
+        // state.error = err;
+    } finally {
+        // state.isLoading = false;
+        resolve();
+    }
+});
 }
 
 </script>
@@ -21,7 +36,7 @@ function doAjax(){
     <h1>{{ msg }}</h1>
 
     <div class="card">
-      <button type="button" @click="doAjax">count is not {{ count }}</button>
+      <button type="button" @click="doAjax()">count is not {{ count }}</button>
       <p>
         Edit
         <code>components/HelloWorld.vue</code> to test HMR + X
