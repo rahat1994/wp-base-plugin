@@ -29,7 +29,7 @@ class AjaxHandler implements ApiHandlerInterface
 
     public function getAccessRole()
     {
-        return apply_filters('DLCT_LOG_admin_access_role', 'manage_options');
+        return apply_filters('WP_BASE_admin_access_role', 'manage_options');
     }
 
     public function verify($request)
