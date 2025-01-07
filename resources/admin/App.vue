@@ -1,66 +1,17 @@
 <script setup>
-import { Button } from "@/components/ui/button";
-import {
-    NavigationMenu,
-    NavigationMenuContent,
-    NavigationMenuItem,
-    NavigationMenuLink,
-    NavigationMenuList,
-    NavigationMenuTrigger,
-    navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu";
-
-const components = [
-    {
-        title: "Alert Dialog",
-        href: "/docs/components/alert-dialog",
-        description:
-            "A modal dialog that interrupts the user with important content and expects a response.",
-    },
-    {
-        title: "Hover Card",
-        href: "/docs/components/hover-card",
-        description:
-            "For sighted users to preview content available behind a link.",
-    },
-    {
-        title: "Progress",
-        href: "/docs/components/progress",
-        description:
-            "Displays an indicator showing the completion progress of a task, typically displayed as a progress bar.",
-    },
-    {
-        title: "Scroll-area",
-        href: "/docs/components/scroll-area",
-        description: "Visually or semantically separates content.",
-    },
-    {
-        title: "Tabs",
-        href: "/docs/components/tabs",
-        description:
-            "A set of layered sections of content—known as tab panels—that are displayed one at a time.",
-    },
-    {
-        title: "Tooltip",
-        href: "/docs/components/tooltip",
-        description:
-            "A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.",
-    },
-];
+import { RouterLink, RouterView } from "vue-router";
 </script>
 
 <template>
-    <NavigationMenu>
-        <NavigationMenuList>
-            <NavigationMenuItem>
-                <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-                <NavigationMenuTrigger>Components</NavigationMenuTrigger>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-                <NavigationMenuTrigger>Components</NavigationMenuTrigger>
-            </NavigationMenuItem>
-        </NavigationMenuList>
-    </NavigationMenu>
+    <div class="space-y-4 pt-4">
+        <h1>Hello App!</h1>
+        <p><strong>Current route path:</strong> {{ $route.fullPath }}</p>
+        <nav>
+            <RouterLink to="/">Go to Home</RouterLink>
+            <RouterLink to="/settings">Go to About</RouterLink>
+        </nav>
+        <main>
+            <RouterView />
+        </main>
+    </div>
 </template>
