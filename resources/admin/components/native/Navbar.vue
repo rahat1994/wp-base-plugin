@@ -2,12 +2,14 @@
 import { RouterLink } from "vue-router";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { CloudDownload } from "lucide-vue-next";
 
 export default {
     name: "Navbar",
     components: {
         RouterLink,
         Button,
+        CloudDownload,
     },
     methods: {
         cn(...args) {
@@ -79,12 +81,15 @@ const components = [
                     Settings
                 </router-link>
             </nav>
-            <div class="">
+            <div>
                 <div class="flex items-center justify-between space-y-2">
                     <h2 class="text-3xl font-bold tracking-tight">
                         Welcome Back
                     </h2>
-                    <Button> Export Data </Button>
+                    <Button>
+                        <CloudDownload />
+                        Export Data
+                    </Button>
                 </div>
             </div>
         </div>

@@ -20,7 +20,7 @@ export const columns = [
                         "a",
                         {
                             href: "#",
-                            class: "delete-link text-sm font-thin text-red-500",
+                            class: "delete-link text-sm font-thin text-red-500 border-l-2 border-gray-300 pl-2",
                         },
                         "Delete"
                     ),
@@ -28,7 +28,7 @@ export const columns = [
                         "a",
                         {
                             href: "#",
-                            class: "view-link text-sm font-thin text-blue-500",
+                            class: "view-link text-sm font-thin text-blue-500 border-l-2 border-gray-300 pl-1",
                         },
                         "View"
                     ),
