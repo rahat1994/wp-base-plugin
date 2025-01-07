@@ -10,7 +10,7 @@ async function getData() {
         {
             id: "728ed52f",
             title: "Ecommerce Subreddit",
-            author: "John Doe",
+            author: "johndoe@gmail.com",
             date: "2021-09-01",
             shortCode: "[wprb-subreddit-feed feed=21]",
             amount: 100,
