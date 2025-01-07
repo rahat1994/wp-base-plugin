@@ -1,36 +1,66 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import NewComponent from './components/NewComponent.vue'
+import { Button } from "@/components/ui/button";
+import {
+    NavigationMenu,
+    NavigationMenuContent,
+    NavigationMenuItem,
+    NavigationMenuLink,
+    NavigationMenuList,
+    NavigationMenuTrigger,
+    navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
 
-const vitelogo = wpbaseplugin.url + '/public/vite.svg'
-const vuelogo = wpbaseplugin.url + '/resources/assets/vue.svg'
+const components = [
+    {
+        title: "Alert Dialog",
+        href: "/docs/components/alert-dialog",
+        description:
+            "A modal dialog that interrupts the user with important content and expects a response.",
+    },
+    {
+        title: "Hover Card",
+        href: "/docs/components/hover-card",
+        description:
+            "For sighted users to preview content available behind a link.",
+    },
+    {
+        title: "Progress",
+        href: "/docs/components/progress",
+        description:
+            "Displays an indicator showing the completion progress of a task, typically displayed as a progress bar.",
+    },
+    {
+        title: "Scroll-area",
+        href: "/docs/components/scroll-area",
+        description: "Visually or semantically separates content.",
+    },
+    {
+        title: "Tabs",
+        href: "/docs/components/tabs",
+        description:
+            "A set of layered sections of content—known as tab panels—that are displayed one at a time.",
+    },
+    {
+        title: "Tooltip",
+        href: "/docs/components/tooltip",
+        description:
+            "A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.",
+    },
+];
 </script>
 
 <template>
-  <div>
-    <div>
-      <a href="https://vitejs.dev" target="_blank">
-        <img :src="vitelogo" class="logo" alt="Vite logo" />
-      </a>
-      <a href="https://vuejs.org/" target="_blank">
-        <img :src="vuelogo" class="logo vue" alt="Vue logo" />
-      </a>
-    </div>
-    <HelloWorld msg="Vite + Vue" />
-    <NewComponent />
-  </div>
+    <NavigationMenu>
+        <NavigationMenuList>
+            <NavigationMenuItem>
+                <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+                <NavigationMenuTrigger>Components</NavigationMenuTrigger>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+                <NavigationMenuTrigger>Components</NavigationMenuTrigger>
+            </NavigationMenuItem>
+        </NavigationMenuList>
+    </NavigationMenu>
 </template>
-
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
