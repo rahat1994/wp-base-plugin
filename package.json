@@ -12,7 +12,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@tanstack/vue-table": "^8.20.5",
     "@vitejs/plugin-vue": "^5.2.1",
+    "@vueuse/core": "^12.3.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-vue-next": "^0.469.0",

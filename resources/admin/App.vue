@@ -1,15 +1,11 @@
 <script setup>
 import { RouterLink, RouterView } from "vue-router";
+import Navbar from "@/components/native/Navbar.vue";
 </script>
 
 <template>
-    <div class="space-y-4 pt-4">
-        <h1>Hello App!</h1>
-        <p><strong>Current route path:</strong> {{ $route.fullPath }}</p>
-        <nav>
-            <RouterLink to="/">Go to Home</RouterLink>
-            <RouterLink to="/settings">Go to About</RouterLink>
-        </nav>
+    <div class="space-y-4 pt-4 px-4">
+        <Navbar />
         <main>
             <RouterView />
         </main>
