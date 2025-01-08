@@ -1,4 +1,6 @@
 import { h } from "vue";
+import { Separator } from "@/components/ui/separator";
+import ActionLink from "./ActionLink.vue";
 
 export const columns = [
     {
@@ -9,26 +11,28 @@ export const columns = [
                 h("span", row.getValue("title")),
                 h("div", { class: "actions space-x-2" }, [
                     h(
-                        "a",
+                        ActionLink,
                         {
-                            href: "#",
-                            class: "edit-link text-sm font-thin text-blue-500",
+                            to: "/settings",
+                            label: "Edit",
                         },
                         "Edit"
                     ),
                     h(
-                        "a",
+                        ActionLink,
                         {
-                            href: "#",
-                            class: "delete-link text-sm font-thin text-red-500 border-l-2 border-gray-300 pl-2",
+                            to: "/settings",
+                            label: "Delete",
+                            color: "red-500",
+                            hasSeparator: true,
                         },
                         "Delete"
                     ),
                     h(
-                        "a",
+                        ActionLink,
                         {
-                            href: "#",
-                            class: "view-link text-sm font-thin text-blue-500 border-l-2 border-gray-300 pl-1",
+                            to: "/settings",
+                            hasSeparator: true,
                         },
                         "View"
                     ),
