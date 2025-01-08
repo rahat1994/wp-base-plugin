@@ -1,14 +1,13 @@
 import { h } from "vue";
-import { Separator } from "@/components/ui/separator";
 import ActionLink from "./ActionLink.vue";
 
 export const columns = [
     {
-        accessorKey: "title",
+        accessorKey: "post_title",
         header: () => h("div", { class: "text-left" }, "Title"),
         cell: ({ row }) => {
             return h("div", { class: "text-left font-medium" }, [
-                h("span", row.getValue("title")),
+                h("span", row.getValue("post_title")),
                 h("div", { class: "actions space-x-2" }, [
                     h(
                         ActionLink,
@@ -41,27 +40,45 @@ export const columns = [
         },
     },
     {
-        accessorKey: "author",
-        header: () => h("div", { class: "text-left" }, "Email"),
+        accessorKey: "post_status",
+        header: () => h("div", { class: "text-left" }, "Status"),
         cell: ({ row }) => {
             return h(
                 "div",
                 { class: "text-left font-medium" },
-                row.getValue("author")
+                row.getValue("post_status")
             );
         },
     },
     {
-        accessorKey: "amount",
-        header: () => h("div", { class: "text-left" }, "Amount"),
+        accessorKey: "ID",
+        header: () => h("div", { class: "text-left" }, "Shortcode"),
         cell: ({ row }) => {
-            const amount = Number.parseFloat(row.getValue("amount"));
-            const formatted = new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: "USD",
-            }).format(amount);
-
-            return h("div", { class: "text-left font-medium" }, formatted);
+            const id = Number.parseFloat(row.getValue("ID"));
+            const shortcode = "[wprb-subreddit-feed id=" + id + "]";
+            const copyToClipboard = () => {
+                if (navigator.clipboard) {
+                    navigator.clipboard
+                        .writeText(shortcode)
+                        .then(() => {
+                            alert("Shortcode copied to clipboard!");
+                        })
+                        .catch((err) => {
+                            console.error("Failed to copy: ", err);
+                        });
+                } else {
+                    console.warn("Clipboard API not available");
+                }
+            };
+            return h(
+                "code",
+                {
+                    onClick: copyToClipboard,
+                    style: { cursor: "pointer" },
+                    title: "Click to copy",
+                },
+                shortcode
+            );
         },
     },
 ];

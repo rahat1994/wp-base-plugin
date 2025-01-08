@@ -35,7 +35,7 @@ const table = useVueTable({
             <Input
                 class="max-w-sm"
                 placeholder="Filter title..."
-                :model-value="table.getColumn('email')?.getFilterValue() as string"
+                :model-value="table.getColumn('title')?.getFilterValue() as string"
                 @update:model-value="
                     table.getColumn('title')?.setFilterValue($event)
                 "
