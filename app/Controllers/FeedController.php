@@ -18,7 +18,7 @@ class FeedController extends BaseController {
         try {
             $feeds = $this->get();
 
-            
+
 
             wp_send_json_success([
                 'success' => true,

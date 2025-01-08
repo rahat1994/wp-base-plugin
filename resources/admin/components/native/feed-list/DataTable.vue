@@ -11,7 +11,12 @@ import {
     TableRow,
 } from "@/components/ui/table";
 
-import { FlexRender, getCoreRowModel, useVueTable } from "@tanstack/vue-table";
+import {
+    FlexRender,
+    getPaginationRowModel,
+    getCoreRowModel,
+    useVueTable,
+} from "@tanstack/vue-table";
 
 const props = defineProps<{
     columns: [];
@@ -26,6 +31,7 @@ const table = useVueTable({
         return props.columns;
     },
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
 });
 </script>
 
@@ -92,6 +98,24 @@ const table = useVueTable({
                     </template>
                 </TableBody>
             </Table>
+        </div>
+        <div class="flex items-center justify-end py-4 space-x-2">
+            <Button
+                variant="outline"
+                size="sm"
+                :disabled="!table.getCanPreviousPage()"
+                @click="table.previousPage()"
+            >
+                Previous
+            </Button>
+            <Button
+                variant="outline"
+                size="sm"
+                :disabled="!table.getCanNextPage()"
+                @click="table.nextPage()"
+            >
+                Next
+            </Button>
         </div>
     </div>
 </template>

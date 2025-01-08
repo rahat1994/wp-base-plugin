@@ -1,19 +1,22 @@
 import { h } from "vue";
 import ActionLink from "./ActionLink.vue";
+import DropdownAction from "@/components/native/feed-list/DataTableDropDown.vue";
 
 export const columns = [
     {
-        accessorKey: "post_title",
+        accessorKey: "title",
         header: () => h("div", { class: "text-left" }, "Title"),
         cell: ({ row }) => {
             return h("div", { class: "text-left font-medium" }, [
-                h("span", row.getValue("post_title")),
-                h("div", { class: "actions space-x-2" }, [
+                h("span", row.getValue("title")),
+                h("div", { class: "actions space-x-2 mt-1" }, [
                     h(
                         ActionLink,
                         {
                             to: "/settings",
                             label: "Edit",
+                            type: "edit",
+                            data: row.original,
                         },
                         "Edit"
                     ),
@@ -23,7 +26,9 @@ export const columns = [
                             to: "/settings",
                             label: "Delete",
                             color: "red-500",
+                            type: "delete",
                             hasSeparator: true,
+                            data: row.original,
                         },
                         "Delete"
                     ),
@@ -32,6 +37,9 @@ export const columns = [
                         {
                             to: "/settings",
                             hasSeparator: true,
+                            label: "View",
+                            type: "view",
+                            data: row.original,
                         },
                         "View"
                     ),
@@ -40,21 +48,32 @@ export const columns = [
         },
     },
     {
-        accessorKey: "post_status",
+        accessorKey: "status",
         header: () => h("div", { class: "text-left" }, "Status"),
         cell: ({ row }) => {
             return h(
                 "div",
                 { class: "text-left font-medium" },
-                row.getValue("post_status")
+                row.getValue("status")
             );
         },
     },
     {
-        accessorKey: "ID",
+        accessorKey: "author",
+        header: () => h("div", { class: "text-left" }, "Author"),
+        cell: ({ row }) => {
+            return h(
+                "div",
+                { class: "text-left font-medium" },
+                row.getValue("author")
+            );
+        },
+    },
+    {
+        accessorKey: "id",
         header: () => h("div", { class: "text-left" }, "Shortcode"),
         cell: ({ row }) => {
-            const id = Number.parseFloat(row.getValue("ID"));
+            const id = Number.parseFloat(row.getValue("id"));
             const shortcode = "[wprb-subreddit-feed id=" + id + "]";
             const copyToClipboard = () => {
                 if (navigator.clipboard) {
@@ -78,6 +97,22 @@ export const columns = [
                     title: "Click to copy",
                 },
                 shortcode
+            );
+        },
+    },
+    {
+        id: "actions",
+        enableHiding: false,
+        header: () => h("div", { class: "text-left" }, "Actions"),
+        cell: ({ row }) => {
+            const payment = row.original;
+
+            return h(
+                "div",
+                { class: "relative" },
+                h(DropdownAction, {
+                    payment,
+                })
             );
         },
     },

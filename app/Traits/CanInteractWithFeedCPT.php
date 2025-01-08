@@ -2,6 +2,8 @@
 
 namespace App\Traits;
 
+use App\Repositories\FeedRepository;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -10,12 +12,7 @@ trait CanInteractWithFeedCPT
 {
     
     public function get(int $limit = 10, int $offset = 0, array $filters = []){
-        $args = [
-            'post_type' => 'subreddit_feed',
-            'post_status' => 'publish',
-            'numberposts' => $limit
-        ];
-        $posts = get_posts($args);
+        $posts = FeedRepository::get_posts();
         return $posts;
     }
 
