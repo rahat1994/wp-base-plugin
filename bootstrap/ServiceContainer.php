@@ -7,7 +7,7 @@ use App\CPT\FeedCPT;
 use App\Interfaces\Commons\ApiHandlerInterface;
 use App\Interfaces\Commons\AssetsLoaderInterface;
 use App\SettingsPage\WPBaseSettingsPage;
-use App\Shortcodes\FeedShortCode;
+use App\ShortCodes\FeedShortCode;
 use App\Validators\RegexValidator;
 use App\Validators\UrlValidator;
 use DI\Container;
@@ -37,13 +37,6 @@ class ServiceContainer
 
         ])->build();
     }
-
-    
-
-    // public function pluginBoot()
-    // {
-    //     $this->container->get(WpBasePlugin::class)->boot();
-    // }
 
     public static function getSettingsPages(){
         return [
