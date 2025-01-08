@@ -72,10 +72,7 @@ const getComponentType = () => {
     }
 };
 
-onMounted(() => {
-    console.log("Sheet mounted");
-    console.log(props.data);
-});
+onMounted(() => {});
 </script>
 
 <style scoped>

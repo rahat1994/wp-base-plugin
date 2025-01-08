@@ -1,0 +1,63 @@
+<?php
+
+namespace App\Repositories;
+
+use App\Repositories\BaseRepository;
+
+class UserRepository extends BaseRepository
+{
+    public static function get_users($args = [])
+    {
+        $default_args = [
+            'number' => 10,
+            'orderby' => 'ID',
+            'order' => 'DESC',
+        ];
+
+        $query_args = wp_parse_args($args, $default_args);
+
+        $user_query = new \WP_User_Query($query_args);
+
+        $users = [];
+        $results = $user_query->get_results();
+        if (!empty($results)) {
+            foreach ($results as $user) {
+                $users[] = [
+                    'username' => $user->user_login,
+                    'email'    => $user->user_email,
+                    'role'     => implode(', ', $user->roles),
+                ];
+            }
+        }
+
+        return $users;
+    }
+
+    public function get_user_by_id($user_id)
+    {
+        $user = get_userdata($user_id);
+
+        if ($user) {
+            return [
+                'id'       => $user->ID,
+                'username' => $user->user_login,
+                'email'    => $user->user_email,
+                'role'     => implode(', ', $user->roles),
+            ];
+        }
+
+        return null;
+    }
+
+    public function get_users_by_meta($meta_key, $meta_value)
+    {
+        $args = [
+            'meta_key'   => $meta_key,
+            'meta_value' => $meta_value,
+        ];
+
+        $user_query = new \WP_User_Query($args);
+
+        return $user_query->get_results();
+    }
+}

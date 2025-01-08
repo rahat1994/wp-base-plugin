@@ -8,23 +8,8 @@ const state = reactive({
     isLoading: false,
     error: null,
     data: [],
+    users: [],
 });
-
-async function getData() {
-    // Fetch data from your API here.
-    return [
-        {
-            id: "1",
-            title: "Ecommerce Subreddit",
-            author: "johndoe@gmail.com",
-            date: "2021-09-01",
-            shortCode: "[wprb-subreddit-feed feed=21]",
-            amount: 100,
-            status: "pending",
-            email: "m@example.com",
-        },
-    ];
-}
 
 async function getFeeds() {
     return new Promise(async (resolve) => {
@@ -56,11 +41,37 @@ async function getFeeds() {
     });
 }
 
-onMounted(() => {
-    getData().then((response) => {
-        state.data = response;
+async function getUsers() {
+    return new Promise(async (resolve) => {
+        try {
+            state.isLoading = true;
+            state.error = null;
+            const args = {
+                route: "users",
+            };
+            const { data, error: fetchError } = await $get(args);
+            if (data && data.value) {
+                if (!data.value.data.success) {
+                    state.error = data.value.data.message;
+                    return;
+                }
+                state.users = JSON.parse(data.value.data.users);
+                console.log(state.users);
+            } else if (fetchError) {
+                state.error = fetchError;
+            }
+        } catch (err) {
+            state.error = err;
+        } finally {
+            state.isLoading = false;
+            resolve();
+        }
     });
+}
+
+onMounted(() => {
     getFeeds();
+    getUsers();
 });
 </script>
 

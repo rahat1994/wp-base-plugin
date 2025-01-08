@@ -2,6 +2,8 @@
 import type { ColumnDef } from "@tanstack/vue-table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Plus, RefreshCw } from "lucide-vue-next";
+import CreateNewFeed from "./sheet-content/CreateNewFeed.vue";
 import {
     Table,
     TableBody,
@@ -39,13 +41,16 @@ const table = useVueTable({
     <div class="w-full">
         <div class="flex gap-2 items-center py-4">
             <Input
-                class="max-w-sm"
                 placeholder="Filter title..."
                 :model-value="table.getColumn('title')?.getFilterValue() as string"
                 @update:model-value="
                     table.getColumn('title')?.setFilterValue($event)
                 "
             />
+            <CreateNewFeed />
+            <Button class="bg-blue-500 hover:bg-blue-600" size="lg">
+                <RefreshCw
+            /></Button>
         </div>
         <div class="border rounded-md">
             <Table>
