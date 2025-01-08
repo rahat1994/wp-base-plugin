@@ -1,6 +1,3 @@
 <?php
 
-$router->get('test', function () {
-        echo 'Hello World';
-        wp_die();
-});
+$router->get('feeds', "FeedController@index");
