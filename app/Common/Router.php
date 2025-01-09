@@ -88,8 +88,8 @@ class Router
      */
     protected function callAction($controller, $action)
     {
-        require DLCT_PLUGIN_DIR . '/app/Controllers/LogController.php';
-        $controller = "DebugLogConfigTool\\Controllers\\{$controller}";
+
+        $controller = "App\\Controllers\\{$controller}";
         $controller = new $controller;
 
         if (! method_exists($controller, $action)) {

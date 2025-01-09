@@ -4,34 +4,39 @@ WP Base Plugin is a WordPress plugin that relies on Vite, Vue, and Composer. Thi
 
 ## Requirements
 
-- WordPress 5.0 or higher
-- PHP 7.4 or higher
-- Node.js 14 or higher
-- Composer
+-   WordPress 6.0 or higher
+-   PHP 8.2 or higher
+-   Node.js 14 or higher
+-   Composer
 
 ## Installation
 
 1. Clone the repository into your WordPress plugins directory:
+
     ```
     git clone https://github.com/your-repo/wp-base-plugin.git wp-content/plugins/wp-base-plugin
     ```
 
 2. Navigate to the plugin directory:
+
     ```
     cd wp-content/plugins/wp-base-plugin
     ```
 
 3. Install PHP dependencies using Composer:
+
     ```
     composer install
     ```
 
 4. Install JavaScript dependencies using npm:
+
     ```
     npm install
     ```
 
 5. Build the assets using Vite:
+
     ```
     npm run build
 
@@ -39,7 +44,6 @@ WP Base Plugin is a WordPress plugin that relies on Vite, Vue, and Composer. Thi
 
     npm run dev
     ```
-
 
 6. Activate the plugin through the WordPress admin dashboard.
 

@@ -28,9 +28,9 @@ class WpBasePlugin
 
     public AjaxHandler $apiHandler;
     public LoadAssets $assetsLoader;
-    public array $CPTS;
-    public array $shortCodes;
-    public array $settingsPages;
+    public array $CPTS = [];
+    public array $shortCodes = [];
+    public array $settingsPages = [];
     public function __construct(AjaxHandler $apiHandler, LoadAssets $assetsLoader)
     {
         $this->apiHandler = $apiHandler;

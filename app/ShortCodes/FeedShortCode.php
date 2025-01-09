@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Shortcodes;
+namespace App\ShortCodes;
 
 use App\Validators\RegexValidator;
 use App\PlatformClients\RedditClient;

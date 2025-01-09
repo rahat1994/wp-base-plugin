@@ -1,5 +1,8 @@
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
+import { fileURLToPath, URL } from "node:url";
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+import autoprefixer from "autoprefixer";
+import tailwind from "tailwindcss";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -9,42 +12,52 @@ export default defineConfig({
         strictPort: true,
         hmr: {
             port: 8880,
-            host: 'localhost',
-            protocol: 'ws',
-        }
+            host: "localhost",
+            protocol: "ws",
+        },
     },
     build: {
         manifest: true,
-        outDir: 'assets',
-        assetsDir: 'assetsDIR',
+        outDir: "assets",
+        assetsDir: "assetsDIR",
         // publicDir: 'public',
         emptyOutDir: true, // delete the contents of the output directory before each build
 
         // https://rollupjs.org/guide/en/#big-list-of-options
         rollupOptions: {
             input: [
-                'resources/admin/main.js',
+                "resources/admin/main.js",
                 // 'src/style.scss',
                 // 'src/assets'
             ],
             output: {
-                chunkFileNames: 'js/[name].js',
-                entryFileNames: 'js/[name].js',
+                chunkFileNames: "js/[name].js",
+                entryFileNames: "js/[name].js",
 
                 assetFileNames: ({ name }) => {
                     // if (/\.(gif|jpe?g|png|svg)$/.test(name ?? '')){
                     //     return 'images/[name][extname]';
                     // }
 
-                    if (/\.css$/.test(name ?? '')) {
-                        return 'css/[name][extname]';
+                    if (/\.css$/.test(name ?? "")) {
+                        return "css/[name][extname]";
                     }
 
                     // default value
                     // ref: https://rollupjs.org/guide/en/#outputassetfilenames
-                    return '[name][extname]';
+                    return "[name][extname]";
                 },
             },
         },
     },
-})
+    css: {
+        postcss: {
+            plugins: [tailwind(), autoprefixer()],
+        },
+    },
+    resolve: {
+        alias: {
+            "@": fileURLToPath(new URL("./resources/admin", import.meta.url)),
+        },
+    },
+});
