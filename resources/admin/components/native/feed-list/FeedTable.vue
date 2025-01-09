@@ -14,6 +14,7 @@ import {
     PaginationNext,
     PaginationPrev,
 } from "@/components/ui/pagination";
+
 const state = reactive({
     isLoading: false,
     error: null,
@@ -90,13 +91,18 @@ onMounted(() => {
     getFeeds();
     getUsers();
 });
+
+function relaodFeeds() {
+    state.currentPage = 1;
+    getFeeds();
+}
 </script>
 
 <template>
     <div>
         <DataTable
             :columns="columns"
-            @reloadFeeds="getFeeds"
+            @reloadFeeds="relaodFeeds"
             :data="state.data"
             :totalNumberOfFeedItems="state.total"
             :users="state.users"

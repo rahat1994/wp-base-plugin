@@ -5,7 +5,10 @@
             <SheetDescription> Edit the feed details below. </SheetDescription>
         </SheetHeader>
         <div class="grid gap-4 py-4">
-            <EditFeedForm :feedData="props.data" />
+            <EditFeedForm
+                :feedData="props.data"
+                @formSubmissionSuccess="handleFormSubmissionSuccess"
+            />
         </div>
     </div>
 </template>
@@ -32,6 +35,7 @@ const props = defineProps({
         required: false,
     },
 });
+const emit = defineEmits(["formSubmissionSuccess"]);
 
 const inputValue = ref("");
 const feedData = ref({
@@ -41,6 +45,12 @@ const feedData = ref({
 const saveContent = () => {
     console.log("Content saved:", inputValue.value);
 };
+
+function handleFormSubmissionSuccess(data) {
+    console.log("EditSheetContent handleFormSubmissionSuccess");
+
+    emit("formSubmissionSuccess");
+}
 
 onMounted(() => {
     console.log("EditSheetContent mounted");

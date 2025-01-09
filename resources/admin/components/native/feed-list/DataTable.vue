@@ -1,16 +1,6 @@
 <script setup lang="ts" generic="TData, TValue">
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-    Pagination,
-    PaginationEllipsis,
-    PaginationFirst,
-    PaginationLast,
-    PaginationList,
-    PaginationListItem,
-    PaginationNext,
-    PaginationPrev,
-} from "@/components/ui/pagination";
 import { Plus, RefreshCw, Users } from "lucide-vue-next";
 import CreateNewFeed from "./sheet-content/CreateNewFeed.vue";
 import {
@@ -36,6 +26,8 @@ const props = defineProps<{
     totalNumberOfFeedItems: number;
 }>();
 
+// defineEmits(["reloadFeeds", "formSubmissionSuccess"]);
+
 const table = useVueTable({
     get data() {
         return props.data;
@@ -51,6 +43,11 @@ const reloadFeeds = () => {
     console.log("Reloading feeds...");
     emit("reloadFeeds");
 };
+
+function handleFormSubmissionSuccess(data) {
+    console.log("DataTable handleFormSubmissionSuccess");
+    emit("reloadFeeds");
+}
 </script>
 
 <template>
@@ -103,8 +100,14 @@ const reloadFeeds = () => {
                             <TableCell
                                 v-for="cell in row.getVisibleCells()"
                                 :key="cell.id"
+                                @formSubmissionSuccess="
+                                    handleFormSubmissionSuccess
+                                "
                             >
                                 <FlexRender
+                                    @formSubmissionSuccess="
+                                        handleFormSubmissionSuccess
+                                    "
                                     :render="cell.column.columnDef.cell"
                                     :props="cell.getContext()"
                                 />

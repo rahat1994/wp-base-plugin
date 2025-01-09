@@ -9,7 +9,11 @@
             <a> {{ label }} </a>
         </SheetTrigger>
         <SheetContent class="pt-10">
-            <EditSheetContent v-if="props.type === 'edit'" :data="props.data" />
+            <EditSheetContent
+                v-if="props.type === 'edit'"
+                :data="props.data"
+                @formSubmissionSuccess="handleFormSubmissionSuccess"
+            />
             <ViewSheetContent
                 v-else-if="props.type === 'view'"
                 :data="props.data"
@@ -59,6 +63,8 @@ const props = defineProps({
     },
 });
 
+defineEmits(["formSubmissionSuccess"]);
+
 const getComponentType = () => {
     switch (props.type) {
         case "edit":
@@ -71,6 +77,11 @@ const getComponentType = () => {
             return EditSheetContent;
     }
 };
+
+function handleFormSubmissionSuccess(data) {
+    console.log("ActionLink handleFormSubmissionSuccess");
+    emit("formSubmissionSuccess", data);
+}
 
 onMounted(() => {});
 </script>

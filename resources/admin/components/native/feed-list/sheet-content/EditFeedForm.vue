@@ -88,8 +88,6 @@ function onSubmit(values) {
 }
 
 async function editFeed(values) {
-    // await for 3 secs
-
     return new Promise(async (resolve) => {
         try {
             state.isLoading = true;
