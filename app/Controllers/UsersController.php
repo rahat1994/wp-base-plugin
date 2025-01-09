@@ -16,7 +16,7 @@ class UsersController extends BaseController {
     public function index(){
 
         try {
-            $authors = $this->getAll();
+            $authors = $this->getAllUsers();
             wp_send_json_success([
                 'success' => true,
                 'users'    => json_encode($authors),

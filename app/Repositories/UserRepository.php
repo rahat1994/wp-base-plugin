@@ -49,6 +49,30 @@ class UserRepository extends BaseRepository
         return null;
     }
 
+    public static function getUserByEmail($email)
+    {
+        $args = [
+            'search' => '*' . $email . '*',
+            'search_columns' => ['user_email'],
+            'number' => 1,
+        ];
+
+        $user_query = new \WP_User_Query($args);
+
+        $results = $user_query->get_results();
+        if (!empty($results)) {
+            $user = $results[0];
+            return [
+                'id'       => $user->ID,
+                'username' => $user->user_login,
+                'email'    => $user->user_email,
+                'role'     => implode(', ', $user->roles),
+            ];
+        }
+
+        return null;
+    }
+
     public function get_users_by_meta($meta_key, $meta_value)
     {
         $args = [

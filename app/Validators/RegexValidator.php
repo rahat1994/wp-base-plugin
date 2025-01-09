@@ -17,12 +17,6 @@ class RegexValidator
         if (preg_match($pattern, $value)) {
             return true;
         }
-
-        if (is_admin()) {
-            set_transient('my_meta_box_error', 'The custom field cannot be empty.', 30);
-            add_action('admin_notices', array($this, 'addAdminNotice'), 10);
-        }
-
         return false;
     }
 

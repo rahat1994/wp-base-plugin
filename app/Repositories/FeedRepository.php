@@ -8,13 +8,15 @@ class FeedRepository extends BaseRepository
 {
     public static $postType = 'subreddit_feed';
 
-    public static function get_posts($args = [])
+    public static function getPosts($args = [])
     {
+        
         $default_args = [
             'post_type'      => self::$postType,   // Adjust post type as needed
             'posts_per_page' => 10,
             'orderby'        => 'id',
             'order'          => 'DESC',
+            'offset'         => 0,
         ];
 
         $query_args = wp_parse_args($args, $default_args);
@@ -31,6 +33,7 @@ class FeedRepository extends BaseRepository
                 'title'  => get_the_title(),
                 'status' => get_post_status(),
                 'author' => get_the_author(),
+                'subreddit_url'  => get_post_meta(get_the_ID(), '_wprb_subreddit_url', true),
             ];
             }
             wp_reset_postdata();
@@ -64,6 +67,56 @@ class FeedRepository extends BaseRepository
         ];
 
         return new \WP_Query($args);
+    }
+
+    public static function createPost($data)
+    {
+        $post_id = wp_insert_post([
+            'post_title'   => $data['post_title'],
+            'post_status'  => 'publish',
+            'post_author'  => $data['post_author'],
+            'post_type'    => self::$postType,
+        ]);
+
+        if ($post_id) {
+            if (isset($data['meta']) && is_array($data['meta'])) {
+                foreach ($data['meta'] as $key => $value) {
+                    update_post_meta($post_id, $key, $value);
+                }
+            }
+        }
+
+        return $post_id;
+    }
+
+    public static function updatePost($post_id, $data)
+    {
+        $post_id = wp_update_post([
+            'ID'           => $post_id,
+            'post_title'   => $data['post_title'],
+            'post_status'  => 'publish',
+            
+        ]);
+
+        if ($post_id) {
+            if (isset($data['meta']) && is_array($data['meta'])) {
+                foreach ($data['meta'] as $key => $value) {
+                    update_post_meta($post_id, $key, $value);
+                }
+            }
+        }
+
+        return $post_id;
+    }
+
+    public static function getTotalNumberOfPosts()
+    {
+        $query = new \WP_Query([
+            'post_type'      => self::$postType,
+            'posts_per_page' => -1,
+        ]);
+
+        return $query->found_posts;
     }
 }
 

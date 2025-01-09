@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Sheet>
+        <Sheet v-model:open="openSheet">
             <SheetTrigger>
                 <Button class="bg-green-500 hover:bg-green-600" size="lg">
                     <Plus /> New Feed
@@ -15,7 +15,10 @@
                         Create a new feed to display on your website.
                     </SheetDescription>
                 </SheetHeader>
-                <FeedForm />
+                <FeedForm
+                    :users="props.users"
+                    @formSubmissionSuccess="feedFormSubmitted"
+                />
                 <SheetFooter class="flex justify-end space-x-2"> </SheetFooter>
             </SheetContent>
         </Sheet>
@@ -39,6 +42,15 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet";
 
+const props = defineProps({
+    users: {
+        type: Array,
+        required: true,
+    },
+});
+const emit = defineEmits(["reloadFeeds"]);
+const openSheet = ref(false);
+
 const confirmDelete = () => {
     // Logic to confirm deletion
     console.log("Content deleted");
@@ -55,6 +67,11 @@ onMounted(() => {
 
 const onSheetOpen = () => {
     console.log("Sheet opened");
+};
+
+const feedFormSubmitted = (data) => {
+    openSheet.value = false;
+    emit("reloadFeeds");
 };
 </script>
 

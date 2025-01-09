@@ -1,41 +1,19 @@
 <template>
     <div class="edit-sheet-content">
         <SheetHeader>
-            <SheetTitle>Edit profile</SheetTitle>
-            <SheetDescription>
-                Make changes to your profile here. Click save when you're done.
-            </SheetDescription>
+            <SheetTitle>Edit Feed</SheetTitle>
+            <SheetDescription> Edit the feed details below. </SheetDescription>
         </SheetHeader>
         <div class="grid gap-4 py-4">
-            <div class="grid grid-cols-4 items-center gap-4">
-                <Label for="name" class="text-right"> Name </Label>
-                <Input
-                    id="name"
-                    default-value="Pedro Duarte"
-                    class="col-span-3"
-                />
-            </div>
-            <div class="grid grid-cols-4 items-center gap-4">
-                <Label for="username" class="text-right"> Username </Label>
-                <Input
-                    id="username"
-                    default-value="@peduarte"
-                    class="col-span-3"
-                />
-            </div>
+            <EditFeedForm :feedData="props.data" />
         </div>
-        <SheetFooter>
-            <SheetClose as-child>
-                <Button type="submit"> Save changes </Button>
-            </SheetClose>
-        </SheetFooter>
     </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { Input } from "@/components/ui/input";
+import { onMounted, ref } from "vue";
 import { Button } from "@/components/ui/button";
+import EditFeedForm from "@/components/native/feed-list/sheet-content/EditFeedForm.vue";
 import {
     Sheet,
     SheetClose,
@@ -46,12 +24,28 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet";
+import { data } from "autoprefixer";
+
+const props = defineProps({
+    data: {
+        type: Object,
+        required: false,
+    },
+});
 
 const inputValue = ref("");
+const feedData = ref({
+    title: "Feed Title",
+});
 
 const saveContent = () => {
     console.log("Content saved:", inputValue.value);
 };
+
+onMounted(() => {
+    console.log("EditSheetContent mounted");
+    console.log(props.data);
+});
 </script>
 
 <style scoped>

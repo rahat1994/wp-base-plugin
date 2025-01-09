@@ -1,8 +1,17 @@
 <script setup lang="ts" generic="TData, TValue">
-import type { ColumnDef } from "@tanstack/vue-table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Plus, RefreshCw } from "lucide-vue-next";
+import {
+    Pagination,
+    PaginationEllipsis,
+    PaginationFirst,
+    PaginationLast,
+    PaginationList,
+    PaginationListItem,
+    PaginationNext,
+    PaginationPrev,
+} from "@/components/ui/pagination";
+import { Plus, RefreshCw, Users } from "lucide-vue-next";
 import CreateNewFeed from "./sheet-content/CreateNewFeed.vue";
 import {
     Table,
@@ -23,6 +32,8 @@ import {
 const props = defineProps<{
     columns: [];
     data: [];
+    users: [];
+    totalNumberOfFeedItems: number;
 }>();
 
 const table = useVueTable({
@@ -35,6 +46,11 @@ const table = useVueTable({
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
 });
+const emit = defineEmits(["reloadFeeds"]);
+const reloadFeeds = () => {
+    console.log("Reloading feeds...");
+    emit("reloadFeeds");
+};
 </script>
 
 <template>
@@ -47,8 +63,12 @@ const table = useVueTable({
                     table.getColumn('title')?.setFilterValue($event)
                 "
             />
-            <CreateNewFeed />
-            <Button class="bg-blue-500 hover:bg-blue-600" size="lg">
+            <CreateNewFeed :users="props.users" @reloadFeeds="reloadFeeds" />
+            <Button
+                @click="reloadFeeds"
+                class="bg-blue-500 hover:bg-blue-600"
+                size="lg"
+            >
                 <RefreshCw
             /></Button>
         </div>
@@ -103,24 +123,6 @@ const table = useVueTable({
                     </template>
                 </TableBody>
             </Table>
-        </div>
-        <div class="flex items-center justify-end py-4 space-x-2">
-            <Button
-                variant="outline"
-                size="sm"
-                :disabled="!table.getCanPreviousPage()"
-                @click="table.previousPage()"
-            >
-                Previous
-            </Button>
-            <Button
-                variant="outline"
-                size="sm"
-                :disabled="!table.getCanNextPage()"
-                @click="table.nextPage()"
-            >
-                Next
-            </Button>
         </div>
     </div>
 </template>
