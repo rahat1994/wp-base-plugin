@@ -65,6 +65,7 @@ function handleFormSubmissionSuccess(data) {
                 @click="reloadFeeds"
                 class="bg-blue-500 hover:bg-blue-600"
                 size="lg"
+                id="reloadFeeds"
             >
                 <RefreshCw
             /></Button>

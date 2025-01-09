@@ -1,5 +1,5 @@
 <template>
-    <Sheet>
+    <Sheet v-model:open="openSheet">
         <SheetTrigger
             as-child
             :class="`text-sm font-thin cursor-pointer text-${color} ${
@@ -32,7 +32,9 @@ import EditSheetContent from "./sheet-content/EditSheetContent.vue";
 import ViewSheetContent from "./sheet-content/ViewSheetContent.vue";
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
+const openSheet = ref(false);
+
 const props = defineProps({
     to: {
         type: String,
@@ -80,6 +82,11 @@ const getComponentType = () => {
 
 function handleFormSubmissionSuccess(data) {
     console.log("ActionLink handleFormSubmissionSuccess");
+    openSheet.value = false;
+    const reloadButton = document.getElementById("reloadFeeds");
+    if (reloadButton) {
+        reloadButton.click();
+    }
     emit("formSubmissionSuccess", data);
 }
 

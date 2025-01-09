@@ -1,6 +1,7 @@
 import { h } from "vue";
 import ActionLink from "./ActionLink.vue";
 import DropdownAction from "@/components/native/feed-list/DataTableDropDown.vue";
+import { RouterLink } from "vue-router";
 
 export const columns = [
     {
@@ -8,7 +9,11 @@ export const columns = [
         header: () => h("div", { class: "text-left" }, "Title"),
         cell: ({ row }) => {
             return h("div", { class: "text-left font-medium" }, [
-                h("span", row.getValue("title")),
+                h(
+                    RouterLink,
+                    { to: "/settings", class: "underline" },
+                    row.getValue("title")
+                ),
                 h("div", { class: "actions space-x-2 mt-1" }, [
                     h(
                         ActionLink,
