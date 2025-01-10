@@ -18,7 +18,7 @@ class FeedShortCode implements ShortcodeInterface
     public RedditClient $redditClient;
     public array $validators;
 
-    public function __construct(RedditClient $redditClient, ){
+    public function __construct(RedditClient $redditClient){
         $this->redditClient = $redditClient;
     }
 

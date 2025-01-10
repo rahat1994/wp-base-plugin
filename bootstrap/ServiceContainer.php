@@ -10,8 +10,7 @@ use App\SettingsPage\WPBaseSettingsPage;
 use App\ShortCodes\FeedShortCode;
 use App\Validators\RegexValidator;
 use App\Validators\UrlValidator;
-use DI\Container;
-use DI\ContainerBuilder;
+use League\Container\Container;
 
 class ServiceContainer
 {
@@ -20,36 +19,54 @@ class ServiceContainer
 
     private final function __construct()
     {
-        $containerBuilder = new ContainerBuilder();
-        $this->container = $containerBuilder->addDefinitions([
-            AssetsLoaderInterface::class => DI\autowire(LoadAssets::class),
-            ApiHandlerInterface::class => DI\autowire(AjaxHandler::class)->property('routesFile', PLUGIN_CONST_DIR . '/routes/routes.php'),
-            Router::class => DI\autowire(Router::class),
-            WpBasePlugin::class => DI\autowire(WpBasePlugin::class)
-                                    ->property('shortCodes', self::getShortCodes()),
-            FeedCPT::class => DI\autowire(FeedCPT::class),
-            UrlValidator::class => DI\autowire(UrlValidator::class),
-            RegexValidator::class => DI\autowire(RegexValidator::class),
-            FeedShortCode::class => DI\autowire(FeedShortCode::class),
-            WPBaseSettingsPage::class => DI\autowire(WpBaseSettingsPage::class),
+        $this->container = new Container();
 
-        ])->build();
+        $this->container->delegate(
+            new League\Container\ReflectionContainer()
+        );
+
+        $this->container->add(LoadAssets::class);
+        $this->container->add(Router::class);
+        $this->container->add(AjaxHandler::class)->addArgument(Router::class);
+        
+        $this->container->add(WpBasePlugin::class)
+            ->addArguments([AjaxHandler::class, LoadAssets::class])
+            ->addMethodCall('setShortCodes', [$this->getShortCodes()]);
+        $this->container->add(FeedCPT::class);
+        $this->container->add(UrlValidator::class);
+        $this->container->add(RegexValidator::class);
+        $this->container->add(FeedShortCode::class);
+        $this->container->add(WPBaseSettingsPage::class);
+
+        // $this->container = $containerBuilder->addDefinitions([
+        //     AssetsLoaderInterface::class => DI\autowire(LoadAssets::class),
+        //     ApiHandlerInterface::class => DI\autowire(AjaxHandler::class)->property('routesFile', PLUGIN_CONST_DIR . '/routes/routes.php'),
+        //     Router::class => DI\autowire(Router::class),
+        //     WpBasePlugin::class => DI\autowire(WpBasePlugin::class)
+        //                             ->property('shortCodes', self::getShortCodes()),
+        //     FeedCPT::class => DI\autowire(FeedCPT::class),
+        //     UrlValidator::class => DI\autowire(UrlValidator::class),
+        //     RegexValidator::class => DI\autowire(RegexValidator::class),
+        //     FeedShortCode::class => DI\autowire(FeedShortCode::class),
+        //     WPBaseSettingsPage::class => DI\autowire(WpBaseSettingsPage::class),
+
+        // ])->build();
     }
 
-    public static function getSettingsPages(){
-        return [
-            DI\get(WPBaseSettingsPage::class)
-        ];
-    }
-    public static function getCPTS(){
-        return [
-            DI\get(FeedCPT::class)
-        ];
-    }
+    // public static function getSettingsPages(){
+    //     return [
+    //         DI\get(WPBaseSettingsPage::class)
+    //     ];
+    // }
+    // public static function getCPTS(){
+    //     return [
+    //         DI\get(FeedCPT::class)
+    //     ];
+    // }
 
-    public static function getShortCodes(){
+    public function getShortCodes(){
         return [
-            DI\get(FeedShortCode::class)
+            $this->container->get(FeedShortCode::class)
         ];
     }
 
