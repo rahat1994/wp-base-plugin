@@ -11,7 +11,7 @@ export const columns = [
             return h("div", { class: "text-left font-medium" }, [
                 h(
                     RouterLink,
-                    { to: "/settings", class: "underline" },
+                    { to: "/editor/" + row.getValue("id"), class: "underline" },
                     row.getValue("title")
                 ),
                 h("div", { class: "actions space-x-2 mt-1" }, [

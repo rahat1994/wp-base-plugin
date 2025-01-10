@@ -22,9 +22,10 @@ const state = reactive({
     users: [],
     total: 0,
     currentPage: 1,
+    filterTitle: "",
 });
 
-async function getFeeds() {
+async function getFeeds(filterTitle = "") {
     return new Promise(async (resolve) => {
         try {
             state.isLoading = true;
@@ -33,6 +34,9 @@ async function getFeeds() {
                 route: "feeds",
                 page: state.currentPage,
             };
+            if (filterTitle) {
+                args.filterTitle = filterTitle;
+            }
             const { data, error: fetchError } = await $get(args);
             if (data && data.value) {
                 if (!data.value.data.success) {
@@ -85,7 +89,7 @@ async function getUsers() {
 
 function updateCurrrentPage(page) {
     state.currentPage = page;
-    getFeeds();
+    getFeeds(state.filterTitle);
 }
 onMounted(() => {
     getFeeds();
@@ -94,7 +98,13 @@ onMounted(() => {
 
 function relaodFeeds() {
     state.currentPage = 1;
+    state.filterTitle = "";
     getFeeds();
+}
+
+function filterUsingTitle(filterTitle) {
+    state.filterTitle = filterTitle;
+    getFeeds(filterTitle);
 }
 </script>
 
@@ -103,6 +113,7 @@ function relaodFeeds() {
         <DataTable
             :columns="columns"
             @reloadFeeds="relaodFeeds"
+            @filterUsingTitle="filterUsingTitle"
             :data="state.data"
             :totalNumberOfFeedItems="state.total"
             :users="state.users"

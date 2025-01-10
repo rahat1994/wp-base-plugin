@@ -17,6 +17,7 @@ class FeedRepository extends BaseRepository
             'orderby'        => 'id',
             'order'          => 'DESC',
             'offset'         => 0,
+            's' => '',
         ];
 
         $query_args = wp_parse_args($args, $default_args);
@@ -24,17 +25,17 @@ class FeedRepository extends BaseRepository
         $query = new \WP_Query($query_args);
 
         $posts = [];
-
+        
         if ($query->have_posts()) {
             while ($query->have_posts()) {
-            $query->the_post();
-            $posts[] = [
-                'id'     => get_the_ID(),
-                'title'  => get_the_title(),
-                'status' => get_post_status(),
-                'author' => get_the_author(),
-                'subreddit_url'  => get_post_meta(get_the_ID(), '_wprb_subreddit_url', true),
-            ];
+                $query->the_post();
+                $posts[] = [
+                    'id'     => get_the_ID(),
+                    'title'  => get_the_title(),
+                    'status' => get_post_status(),
+                    'author' => get_the_author(),
+                    'subreddit_url'  => get_post_meta(get_the_ID(), '_wprb_subreddit_url', true),
+                ];
             }
             wp_reset_postdata();
         }
@@ -42,16 +43,16 @@ class FeedRepository extends BaseRepository
         return $posts;
     }
 
-    public function get_post_by_id($post_id)
+    public static function getPostByID($post_id)
     {
         $args = [
             'p'         => $post_id,
-            'post_type' => 'post',
+            'post_type' => self::$postType,
         ];
 
         $query = new \WP_Query($args);
 
-        return $query->have_posts() ? $query->posts[0] : null;
+        $post = $query->have_posts() ? $query->posts[0] : null;
     }
 
     public function get_posts_by_meta($meta_key, $meta_value)
@@ -109,11 +110,12 @@ class FeedRepository extends BaseRepository
         return $post_id;
     }
 
-    public static function getTotalNumberOfPosts()
+    public static function getTotalNumberOfPosts(string $titleFilter = '')
     {
         $query = new \WP_Query([
             'post_type'      => self::$postType,
             'posts_per_page' => -1,
+            's' =>$titleFilter
         ]);
 
         return $query->found_posts;

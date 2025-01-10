@@ -23,9 +23,15 @@ class FeedController extends BaseController {
             $page = isset($_GET['page']) && 
                     (0 !== $_GET['page']) ? 
                     (int) $_GET['page'] : 1;
+                    
+            if(isset($_GET['filterTitle'])){
+                $filterTitle = sanitize_text_field($_GET['filterTitle']);
+            }else{
+                $filterTitle = '';
+            }
 
-            $feeds = $this->get(10,$page);
-            $total = $this->getTotalNumberOfPosts();
+            $feeds = $this->get(10,$page,$filterTitle);
+            $total = $this->getTotalNumberOfPosts($filterTitle);
 
             wp_send_json_success([
                 'success' => true,
@@ -38,6 +44,32 @@ class FeedController extends BaseController {
             wp_send_json_success([
                 'success' => false,
                 'feeds'    => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function show(){
+
+        if (!isset($_GET['id'])) {
+            wp_send_json_success([
+                'success' => false,
+                'feed'    => 'Feed ID is required!',
+            ]);
+        }
+
+        $_GET['id'] = sanitize_text_field($_GET['id']);
+
+        try {
+            $feed = $this->getByID($_GET['id']);
+
+            wp_send_json_success([
+                'success' => true,
+                'feed'    => json_encode($feed),
+            ]);
+        } catch (\Exception $e) {
+            wp_send_json_success([
+                'success' => false,
+                'feed'    => $e->getMessage(),
             ]);
         }
     }

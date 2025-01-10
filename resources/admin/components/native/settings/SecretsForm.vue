@@ -11,12 +11,16 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-
-import { toast } from "@/components/ui/toast";
-import { cn } from "@/lib/utils";
 import { toTypedSchema } from "@vee-validate/zod";
-import { h, ref } from "vue";
+import { reactive, onMounted } from "vue";
 import * as z from "zod";
+import { $get, $post } from "@/request";
+
+const state = reactive({
+    isLoading: false,
+    error: null,
+    data: { clientId: "client_id", clientSecret: "client_secret" },
+});
 
 const secretsFormSchema = toTypedSchema(
     z.object({
@@ -38,15 +42,77 @@ const secretsFormSchema = toTypedSchema(
 );
 
 async function onSubmit(values) {
-    toast({
-        title: "You submitted the following values:",
-        description: h(
-            "pre",
-            { class: "mt-2 w-[340px] rounded-md bg-slate-950 p-4" },
-            h("code", { class: "text-white" }, JSON.stringify(values, null, 2))
-        ),
+    return new Promise(async (resolve) => {
+        try {
+            state.isLoading = true;
+
+            await new Promise((resolve) => setTimeout(resolve, 500));
+
+            state.error = null;
+            const args = {
+                route: "settings",
+                settings: JSON.stringify({
+                    client_id: values.clientId,
+                    client_secret: values.clientSecret,
+                }),
+            };
+            const { data, error: fetchError } = await $post(args);
+            if (data && data.value) {
+                if (!data.value.data.success) {
+                    state.error = data.value.data.message;
+                    return;
+                }
+                state.data = data.value.data;
+            } else if (fetchError) {
+                state.error = fetchError;
+            }
+        } catch (err) {
+            state.error = err;
+        } finally {
+            state.isLoading = false;
+            resolve();
+        }
     });
 }
+
+async function getSettings() {
+    return new Promise(async (resolve) => {
+        try {
+            state.isLoading = true;
+
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            const settingKeys = ["client_id", "client_secret"];
+
+            state.error = null;
+            const args = {
+                route: "settings",
+                settingKeys: settingKeys,
+            };
+
+            const { data, error: fetchError } = await $get(args);
+            if (data && data.value) {
+                if (!data.value.data.success) {
+                    state.error = data.value.data.message;
+                    return;
+                }
+                console.log(data.value.data.data);
+                state.data = JSON.parse(data.value.data.data);
+                getSettings();
+            } else if (fetchError) {
+                state.error = fetchError;
+            }
+        } catch (err) {
+            state.error = err;
+        } finally {
+            state.isLoading = false;
+            resolve();
+        }
+    });
+}
+
+onMounted(async () => {
+    await getSettings();
+});
 </script>
 
 <template>
@@ -62,6 +128,7 @@ async function onSubmit(values) {
         :validation-schema="secretsFormSchema"
         class="space-y-8"
         @submit="onSubmit"
+        :initial-values="state.data"
     >
         <FormField v-slot="{ componentField }" name="clientId">
             <FormItem>
@@ -71,6 +138,7 @@ async function onSubmit(values) {
                         type="text"
                         placeholder="Your client ID"
                         v-bind="componentField"
+                        v-model="state.data.client_id"
                     />
                 </FormControl>
                 <FormDescription>
@@ -88,6 +156,7 @@ async function onSubmit(values) {
                         type="text"
                         placeholder="Your client secret"
                         v-bind="componentField"
+                        v-model="state.data.client_secret"
                     />
                 </FormControl>
                 <FormDescription>
