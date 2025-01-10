@@ -1,4 +1,5 @@
-<script setup lang="ts" generic="TData, TValue">
+<script setup>
+import { defineProps, defineEmits, ref } from "vue";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus, RefreshCw, Users } from "lucide-vue-next";
@@ -19,15 +20,13 @@ import {
     useVueTable,
 } from "@tanstack/vue-table";
 
-const props = defineProps<{
-    columns: [];
-    data: [];
-    users: [];
-    totalNumberOfFeedItems: number;
-}>();
-
-// defineEmits(["reloadFeeds", "formSubmissionSuccess"]);
-
+const props = defineProps({
+    columns: Array,
+    data: Array,
+    users: Array,
+    totalNumberOfFeedItems: Number,
+});
+const title = ref("");
 const table = useVueTable({
     get data() {
         return props.data;
@@ -38,7 +37,7 @@ const table = useVueTable({
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
 });
-const emit = defineEmits(["reloadFeeds"]);
+const emit = defineEmits(["reloadFeeds", "filterUsingTitle"]);
 const reloadFeeds = () => {
     console.log("Reloading feeds...");
     emit("reloadFeeds");
@@ -48,18 +47,21 @@ function handleFormSubmissionSuccess(data) {
     console.log("DataTable handleFormSubmissionSuccess");
     emit("reloadFeeds");
 }
+
+function filterByTitle() {
+    console.log("Filtering by title...");
+    console.log(title.value);
+    emit("filterUsingTitle", title.value);
+}
 </script>
 
 <template>
     <div class="w-full">
         <div class="flex gap-2 items-center py-4">
-            <Input
-                placeholder="Filter title..."
-                :model-value="table.getColumn('title')?.getFilterValue() as string"
-                @update:model-value="
-                    table.getColumn('title')?.setFilterValue($event)
-                "
-            />
+            <div class="flex w-full items-center gap-1.5">
+                <Input placeholder="Filter title..." v-model="title" />
+                <Button @click="filterByTitle" size="lg"> Search </Button>
+            </div>
             <CreateNewFeed :users="props.users" @reloadFeeds="reloadFeeds" />
             <Button
                 @click="reloadFeeds"

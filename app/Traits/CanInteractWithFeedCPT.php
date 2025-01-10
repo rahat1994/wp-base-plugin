@@ -11,25 +11,27 @@ if (!defined('ABSPATH')) {
 trait CanInteractWithFeedCPT
 {
     
-    public function get(int $limit = 10, int $page = 0, array $filters = []){
+    public function get(int $limit = 10, int $page = 0, string $titleFilter = '', array $filters = []){
         $args = [
             'posts_per_page' => $limit,
             'offset' => ($page -1) * $limit,
             'orderby' => 'id',
             'order' => 'DESC',
+            's' => $titleFilter,
         ];
 
         $posts = FeedRepository::getPosts($args);
         return $posts;
     }
 
-    public function getTotalNumberOfPosts(){
-        $total = FeedRepository::getTotalNumberOfPosts();
+    public function getTotalNumberOfPosts(string $titleFilter = ''){
+        $total = FeedRepository::getTotalNumberOfPosts($titleFilter);
         return $total;
     }
 
     public function getByID($id){
-
+        $post = FeedRepository::getPostByID($id);
+        return $post;
     }
 
     public function create($data){
