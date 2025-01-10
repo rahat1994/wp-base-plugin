@@ -59,6 +59,10 @@ class WpBasePlugin
         }
     }
 
+    public function setShortCodes($shortCodes){
+        $this->shortCodes = $shortCodes;
+    }
+
     public function registerSettingsPages() {
         foreach($this->settingsPages as $page){
             $page->boot();

@@ -15,6 +15,6 @@
         }
     ],
     "require": {
-        "php-di/php-di": "^7.0"
+        "league/container": "^4.2"
     }
 }
