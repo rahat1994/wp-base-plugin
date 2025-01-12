@@ -18,7 +18,7 @@
             </aside>
             <div class="flex-1 lg:max-w-2xl">
                 <div class="space-y-6">
-                    <SecretsForm v-if="key === 'reddit_secrets'" />
+                    <SecretsForm v-if="key === 'reddit_secrets'" />                    
                 </div>
             </div>
         </div>

@@ -16,13 +16,7 @@ import { reactive, onMounted } from "vue";
 import * as z from "zod";
 import { $get, $post } from "@/request";
 import { useForm } from "vee-validate";
-
-const state = reactive({
-    isLoading: false,
-    error: null,
-    data: { clientId: "client_id", clientSecret: "client_secret" },
-});
-
+import LoadingSpinner from "@/components/native/loadingSpinner.vue";
 const secretsFormSchema = toTypedSchema(
     z.object({
         clientId: z
@@ -41,10 +35,28 @@ const secretsFormSchema = toTypedSchema(
             }),
     })
 );
-const { values,resetForm, handleSubmit, isSubmitting, errors, defineField } = useForm({
-    validationSchema: secretsFormSchema,
-    initialValues: state.data,
+
+const formDefination = () => {
+    return {
+        validationSchema: secretsFormSchema,
+        initialValues: {
+            clientId: "",
+            clientSecret: "",
+        },
+    }
+}
+
+const { values,resetForm, handleSubmit, isSubmitting, errors, defineField } = useForm(formDefination());
+
+const state = reactive({
+    isLoading: false,
+    error: null,
 });
+
+
+
+const [clientIdField, clientIdFieldAttrs] = defineField("clientId");
+const [clientSecretField, clientSecretFieldAttrs] = defineField("clientSecret");
 
 const onSubmit = handleSubmit(values => {    
     return new Promise(async (resolve) => {
@@ -132,62 +144,69 @@ onMounted(async () => {
 
 
 
-const [clientIdField, clientIdFieldAttrs] = defineField("clientId");
-const [clientSecretField, clientSecretFieldAttrs] = defineField("clientSecret");
+
 </script>
 
 <template>
     <div>
-    <div>
-        <h3 class="text-lg font-medium">Secrets</h3>
-        <p class="text-sm text-muted-foreground">
-            Update your client ID and client secret.
-        </p>
-    </div>
-    <Separator />
-    <form
-        class="space-y-8"
-        @submit="onSubmit"
-    >
-        <FormField name="clientId">
-            <FormItem>
-                <FormLabel>Client ID</FormLabel>
-                <FormControl>
-                    <Input
-                        type="text"
-                        placeholder="Your client ID"
-                        v-bind="clientIdFieldAttrs"
-                        v-model="clientIdField"
-                    />
-                </FormControl>
-                <FormDescription>
-                    This is the client ID for your application.
-                </FormDescription>
-                <FormMessage />
-            </FormItem>
-        </FormField>
-
-        <FormField name="clientSecret">
-            <FormItem>
-                <FormLabel>Client Secret</FormLabel>
-                <FormControl>
-                    <Input
-                        type="text"
-                        placeholder="Your client secret"
-                        v-bind="clientSecretFieldAttrs"
-                        v-model="clientSecretField"
-                    />
-                </FormControl>
-                <FormDescription>
-                    This is the client secret for your application.
-                </FormDescription>
-                <FormMessage />
-            </FormItem>
-        </FormField>
-
-        <div class="flex justify-start">
-            <Button type="submit"> Update secrets </Button>
+        <div>
+            <h3 class="text-lg font-medium">Secrets</h3>
+            <p class="text-sm text-muted-foreground">
+                Update your client ID and client secret.
+            </p>
         </div>
-    </Form>
+        <Separator />
+        <form
+            class="space-y-8"
+            @submit="onSubmit"
+            
+        >
+            <FormField name="clientId">
+                <FormItem>
+                    <FormLabel>Client ID</FormLabel>
+                    <FormControl>
+                        <Input
+                            type="text"
+                            placeholder="Your client ID"
+                            @disabled="state.isLoading"
+                            v-bind="clientIdFieldAttrs"
+                            v-model="clientIdField"
+                        />
+                    </FormControl>
+                    <FormDescription>
+                        This is the client ID for your application.
+                    </FormDescription>
+                    <FormMessage />
+                </FormItem>
+            </FormField>
+
+            <FormField name="clientSecret">
+                <FormItem>
+                    <FormLabel>Client Secret</FormLabel>
+                    <FormControl>
+                        <Input
+                            type="text"
+                            placeholder="Your client secret"
+                            @disabled="state.isLoading"
+                            v-bind="clientSecretFieldAttrs"
+                            v-model="clientSecretField"
+                        />
+                    </FormControl>
+                    <FormDescription>
+                        This is the client secret for your application.
+                    </FormDescription>
+                    <FormMessage />
+                </FormItem>
+            </FormField>
+
+            <div class="flex justify-start">
+                
+                <Button type="submit" @disabled="isSubmitting || state.isLoading">
+                    <LoadingSpinner v-if="isSubmitting || state.isLoading" />
+                     Update secrets 
+                     
+                </Button>
+            </div>
+        </form>
     </div>
 </template>

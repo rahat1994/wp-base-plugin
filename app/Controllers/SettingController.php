@@ -12,7 +12,8 @@ use App\Traits\CanInteractWithSettings;
 class SettingController extends BaseController
 {
     use CanInteractWithSettings;
-    public function index(){
+    public function index()
+    {
 
         if (!isset($_GET['settingKeys'])) {
             wp_send_json_success([
@@ -30,11 +31,8 @@ class SettingController extends BaseController
         ]);
     }
 
-    public function updateSetting(){
-
-    }
-
-    public function store(){
+    public function store()
+    {
         if (!isset($_POST['settings'])) {
             wp_send_json_success([
                 'success' => false,
@@ -45,25 +43,27 @@ class SettingController extends BaseController
             $_POST['settings'] = wp_unslash($_POST['settings']);
             $args = json_decode(sanitize_text_field($_POST['settings']), true);
 
-            error_log(print_r($args, true));
-            if($this->addSettings($args)){
+            $settings = $this->getSettings(array_keys($args));
+
+            foreach ($settings as $key => $value) {
+                if (isset($args[$key]) && $args[$key] !== null) {
+                    $this->updateSettings([$key => $args[$key]]);
+                }
+            }
+
+            if ($this->addSettings($args)) {
                 wp_send_json_success([
                     'success' => true,
                     'settings'    => 'Settings added successfully!',
                 ]);
-            } else {
-                wp_send_json_success([
-                    'success' => false,
-                    'settings'    => 'Failed to add settings!',
-                ]);
             }
+
+            throw new \Exception("Settings not added", 1);
         } catch (\Exception $e) {
             wp_send_json_success([
                 'success' => false,
                 'settings'    => $e->getMessage(),
             ]);
         }
-        
-        
     }
 }

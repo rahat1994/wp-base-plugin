@@ -10,7 +10,8 @@ if (!defined('ABSPATH')) {
 
 trait CanInteractWithSettings
 {
-    public function getSettings($args = []){
+    public function getSettings($args = [])
+    {
         $settings = [];
 
         foreach ($args as $key) {
@@ -19,29 +20,25 @@ trait CanInteractWithSettings
         return $settings;
     }
 
-    public function addSettings($data){
+    public function addSettings($data)
+    {
         $flag = false;
         foreach ($data as $key => $value) {
-           $flag = SettingRepository::addSetting($key, $value);
+            $flag = SettingRepository::addSetting($key, $value);
         }
         return $flag;
     }
-    
-    public function updateSettings($data){
+
+    public function updateSettings($data)
+    {
         foreach ($data as $key => $value) {
             SettingRepository::updateSetting($key, $value);
         }
     }
-    
-    public function deleteSettings($id){
-        
-    }
-    
-    public function createSettings($data){
-        
-    }
-    
-    public function getAllSettings(){
-        
-    }
+
+    public function deleteSettings($id) {}
+
+    public function createSettings($data) {}
+
+    public function getAllSettings() {}
 }
