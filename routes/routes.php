@@ -2,6 +2,7 @@
 
 $router->get('feeds', "FeedController@index");
 $router->get('feed', "FeedController@show");
+$router->post('deleteFeed', "FeedController@delete");
 $router->post('feeds', "FeedController@store");
 $router->post('edit-feed', "FeedController@update");
 

@@ -27,9 +27,10 @@ class FeedShortCode implements ShortcodeInterface
     }
 
     public function render_subreddit_feed($atts = [], $content = null, $tag = ''){
+        
         // normalize attribute keys, lowercase
         $atts = array_change_key_case( (array) $atts, CASE_LOWER );
-
+        
         // override default attributes with user attributes
         $shortcodeAtts = shortcode_atts(
             array(
@@ -40,7 +41,7 @@ class FeedShortCode implements ShortcodeInterface
         if ($shortcodeAtts['feed'] == null) {
             return '<div class="wprb-subreddit-rss">'.__('Missing feed attribute', 'wprb-subreddit-rss').'</div>';
         }
-
+        
         $rssUrl = $this->getSubredditRssUrl($shortcodeAtts['feed']);
 
         if(!$rssUrl){
@@ -80,10 +81,8 @@ class FeedShortCode implements ShortcodeInterface
         $isRedditUrl = $regexValidator->validate($metaValue);
 
         if ($isRedditUrl) {
-            return $metaValue. '/.rss';
+            return $metaValue;
         }
-
-
 
         return false;
     }

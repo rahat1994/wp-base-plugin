@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+
 import { toTypedSchema } from "@vee-validate/zod";
 import { reactive, onMounted } from "vue";
 import * as z from "zod";
@@ -137,7 +138,6 @@ onMounted(async () => {
                     <Input
                         type="text"
                         placeholder="Your client ID"
-                        v-bind="componentField"
                         v-model="state.data.client_id"
                     />
                 </FormControl>
@@ -155,7 +155,6 @@ onMounted(async () => {
                     <Input
                         type="text"
                         placeholder="Your client secret"
-                        v-bind="componentField"
                         v-model="state.data.client_secret"
                     />
                 </FormControl>

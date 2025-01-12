@@ -161,5 +161,8 @@ class FeedController extends BaseController {
         }
 
     }
+    public function delete(){
+        
+    }
     
 }

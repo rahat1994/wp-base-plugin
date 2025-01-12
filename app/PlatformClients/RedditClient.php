@@ -4,19 +4,27 @@
 
 namespace App\PlatformClients;
 
+use App\Traits\CanInteractWithSettings;
+
 if (!defined('ABSPATH')) {
     exit;
 }
 
 class RedditClient
 {
+    use CanInteractWithSettings;
 
     // Your Reddit API credentials
-    protected $clientId = 'DiDzaaj1Nr9npMtqVbec2g';
-    protected $clientSecret = 'on3b9vhp8_xJ3OCOUPb3WCoY2AKTNw';
+    protected $clientId;
+    protected $clientSecret;
     protected $userAgent = 'rahatsplugin/1.0 by Rahat Baksh';
 
     public function getAccessToken(){
+
+        $settings = $this->getSettings(['client_id', 'client_secret']);
+        $this->clientId = $settings['client_id'];
+        $this->clientSecret = $settings['client_secret'];
+        
         // Step 1: Get access token
         $authUrl = 'https://www.reddit.com/api/v1/access_token';
         $authHeaders = [

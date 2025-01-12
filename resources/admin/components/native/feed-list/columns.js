@@ -79,7 +79,7 @@ export const columns = [
         header: () => h("div", { class: "text-left" }, "Shortcode"),
         cell: ({ row }) => {
             const id = Number.parseFloat(row.getValue("id"));
-            const shortcode = "[wprb-subreddit-feed id=" + id + "]";
+            const shortcode = "[wprb-subreddit-feed feed=" + id + "]";
             const copyToClipboard = () => {
                 if (navigator.clipboard) {
                     navigator.clipboard

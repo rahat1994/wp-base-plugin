@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
 class RegexValidator
 {
 
-    public function validate(string $value, string $pattern = "/^https:\/\/www\.reddit\.com\/r\/[a-zA-Z0-9_-]+$/", string $message = ''): bool
+    public function validate(string $value, string $pattern = "/^https?:\/\/(www\.)?reddit\.com\/r\/[a-zA-Z0-9_-]+\/?$/", string $message = ''): bool
     {
         if (preg_match($pattern, $value)) {
             return true;
