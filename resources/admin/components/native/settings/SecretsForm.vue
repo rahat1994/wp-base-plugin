@@ -11,11 +11,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-
 import { toTypedSchema } from "@vee-validate/zod";
 import { reactive, onMounted } from "vue";
 import * as z from "zod";
 import { $get, $post } from "@/request";
+import { useForm } from "vee-validate";
 
 const state = reactive({
     isLoading: false,
@@ -41,8 +41,12 @@ const secretsFormSchema = toTypedSchema(
             }),
     })
 );
+const { values,resetForm, handleSubmit, isSubmitting, errors, defineField } = useForm({
+    validationSchema: secretsFormSchema,
+    initialValues: state.data,
+});
 
-async function onSubmit(values) {
+const onSubmit = handleSubmit(values => {    
     return new Promise(async (resolve) => {
         try {
             state.isLoading = true;
@@ -74,7 +78,7 @@ async function onSubmit(values) {
             resolve();
         }
     });
-}
+}) 
 
 async function getSettings() {
     return new Promise(async (resolve) => {
@@ -97,8 +101,8 @@ async function getSettings() {
                     return;
                 }
                 console.log(data.value.data.data);
-                state.data = JSON.parse(data.value.data.data);
-                getSettings();
+                hydrateForm(JSON.parse(data.value.data.data));
+                
             } else if (fetchError) {
                 state.error = fetchError;
             }
@@ -111,12 +115,29 @@ async function getSettings() {
     });
 }
 
+const hydrateForm = (data) => {
+    console.log(data.client_id);
+    console.log("This is hydrate form");
+    
+    resetForm({
+        values: {
+            clientId: data.client_id,
+            clientSecret: data.client_secret,
+        },
+    });
+}
 onMounted(async () => {
-    await getSettings();
+    getSettings();
 });
+
+
+
+const [clientIdField, clientIdFieldAttrs] = defineField("clientId");
+const [clientSecretField, clientSecretFieldAttrs] = defineField("clientSecret");
 </script>
 
 <template>
+    <div>
     <div>
         <h3 class="text-lg font-medium">Secrets</h3>
         <p class="text-sm text-muted-foreground">
@@ -124,21 +145,19 @@ onMounted(async () => {
         </p>
     </div>
     <Separator />
-    <Form
-        v-slot="{ setFieldValue }"
-        :validation-schema="secretsFormSchema"
+    <form
         class="space-y-8"
         @submit="onSubmit"
-        :initial-values="state.data"
     >
-        <FormField v-slot="{ componentField }" name="clientId">
+        <FormField name="clientId">
             <FormItem>
                 <FormLabel>Client ID</FormLabel>
                 <FormControl>
                     <Input
                         type="text"
                         placeholder="Your client ID"
-                        v-model="state.data.client_id"
+                        v-bind="clientIdFieldAttrs"
+                        v-model="clientIdField"
                     />
                 </FormControl>
                 <FormDescription>
@@ -148,14 +167,15 @@ onMounted(async () => {
             </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="clientSecret">
+        <FormField name="clientSecret">
             <FormItem>
                 <FormLabel>Client Secret</FormLabel>
                 <FormControl>
                     <Input
                         type="text"
                         placeholder="Your client secret"
-                        v-model="state.data.client_secret"
+                        v-bind="clientSecretFieldAttrs"
+                        v-model="clientSecretField"
                     />
                 </FormControl>
                 <FormDescription>
@@ -169,4 +189,5 @@ onMounted(async () => {
             <Button type="submit"> Update secrets </Button>
         </div>
     </Form>
+    </div>
 </template>
