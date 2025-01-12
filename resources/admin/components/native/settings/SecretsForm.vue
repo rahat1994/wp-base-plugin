@@ -154,6 +154,9 @@ onMounted(async () => {
             <p class="text-sm text-muted-foreground">
                 Update your client ID and client secret.
             </p>
+            <p v-if="state.isLoading" class="text-sm text-muted-foreground">
+                Loading ...
+            </p>
         </div>
         <Separator />
         <form
