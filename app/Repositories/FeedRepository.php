@@ -155,5 +155,12 @@ class FeedRepository extends BaseRepository
     {
         return wp_delete_post($post_id, true);
     }
+
+    public static function changePostStatus($post_id, $status)  {
+        return wp_update_post([
+            'ID' => $post_id,
+            'post_status' => $status,
+        ]);
+    }
 }
 

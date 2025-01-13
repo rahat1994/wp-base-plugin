@@ -51,6 +51,12 @@ trait CanInteractWithFeedCPT
 
     }
 
+    public function changeFeedStatus($id, $status = 'publish'){
+        return FeedRepository::changePostStatus($id, $status);
+    }   
 
+    public function regenerateFeedCache($id){
+        return FeedRepository::regenerateCache($id);
+    }
 
 }

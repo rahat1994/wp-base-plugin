@@ -81,7 +81,7 @@ class WpBasePlugin
     public function activatePlugin()
     {
         register_activation_hook(__FILE__, function ($netWorkWide) {
-            $this->pluginActivator->migrateDatabases($newWorkWide);
+            $this->pluginActivator->migrateDatabases($netWorkWide);
         });
     }
 

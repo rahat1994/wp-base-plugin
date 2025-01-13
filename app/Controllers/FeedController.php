@@ -23,6 +23,12 @@ class FeedController extends BaseController {
         'default'
     ];
 
+    public array $acceptedStatuses = [
+        'publish',
+        'draft',
+        'trash',
+    ];
+
     public function index(){
 
         try {
@@ -205,6 +211,64 @@ class FeedController extends BaseController {
             ]);
         }
 
+    }
+
+    public function changeStatus(){
+        if (empty($_POST['id']) || empty($_POST['status'])) {
+            wp_send_json_success([
+                'success' => false,
+                'feed'    => 'post id and status is required!',
+            ]);
+        }
+
+        $_POST['id'] = sanitize_text_field($_POST['id']);
+        $_POST['status'] = sanitize_text_field($_POST['status']);
+
+        if(in_array($_POST['status'], $this->acceptedStatuses, true) === false){
+            wp_send_json_success([
+                'success' => false,
+                'feed'    => 'Status is not accepted!',
+            ]);
+        }
+
+        try {
+            $this->changeFeedStatus($_POST['id'], $_POST['status']);
+
+            wp_send_json_success([
+                'success' => true,
+                'feed'    => 'Feed status changed successfully!',
+            ]);
+        } catch (\Exception $e) {
+            wp_send_json_success([
+                'success' => false,
+                'feed'    => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function regenerateCache(){
+        if (empty($_POST['id'])) {
+            wp_send_json_success([
+                'success' => false,
+                'feed'    => 'post id is required!',
+            ]);
+        }
+
+        $_POST['id'] = sanitize_text_field($_POST['id']);
+
+        try {
+            $this->regenerateFeedCache($_POST['id']);
+
+            wp_send_json_success([
+                'success' => true,
+                'feed'    => 'Cache regenerated successfully!',
+            ]);
+        } catch (\Exception $e) {
+            wp_send_json_success([
+                'success' => false,
+                'feed'    => $e->getMessage(),
+            ]);
+        }
     }
     
 }
