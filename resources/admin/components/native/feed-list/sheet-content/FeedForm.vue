@@ -4,6 +4,8 @@ import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { useForm } from "vee-validate";
 import LoadingSpinner from "../../loadingSpinner.vue";
+import { Checkbox } from "@/components/ui/checkbox";
+
 import {
     FormControl,
     FormDescription,
@@ -68,13 +70,9 @@ const secretsFormSchema = toTypedSchema(
             .min(2, {
                 message: "Title must be at least 2 characters.",
             }),
-        author_email: z
-            .string({
-                required_error: "Author email is required.",
-            })
-            .email({
-                message: "Author email must be a valid email.",
-            }),
+        feed_type: z.string({
+            required_error: "Feed type is required.",
+        }),
         subreddit_url: z
             .string({
                 required_error: "Subreddit URL is required.",
@@ -82,21 +80,32 @@ const secretsFormSchema = toTypedSchema(
             .regex(/^https:\/\/(www\.)?reddit\.com\/r\/[A-Za-z0-9_]+\/?$/, {
                 message: "Subreddit URL must be a valid URL to a subreddit.",
             }),
+        should_be_cached: z.boolean().default(false).optional(),
     })
 );
 
-const { handleSubmit } = useForm({
+const { handleSubmit, defineField } = useForm({
     validationSchema: secretsFormSchema,
+    initialValues: {
+        title: "",
+        feed_type: "new",
+        subreddit_url: "",
+        should_be_cached: false,
+    },
 });
 
+const [titleField, titleFieldAttrs] = defineField("title");
+const [feedTypeField, feedTypeFieldAttrs] = defineField("feed_type");
+const [subredditUrlField, subredditUrlFieldAttrs] =
+    defineField("subreddit_url");
+const [shouldBeCachedField, shouldBeCachedFieldAttrs] =
+    defineField("should_be_cached");
+
 const onSubmit = handleSubmit((values) => {
-    console.log(JSON.stringify(values, null, 2));
     createNewFeed(values);
 });
 
 async function createNewFeed(values) {
-    // await for 3 secs
-
     return new Promise(async (resolve) => {
         try {
             state.isLoading = true;
@@ -133,67 +142,63 @@ async function createNewFeed(values) {
         <Separator />
         <br />
         <form class="pt-2" @submit="onSubmit">
-            <FormField v-slot="{ componentField }" name="title">
+            <FormField name="title">
                 <FormItem>
                     <FormLabel>Feed title</FormLabel>
                     <FormControl>
                         <Input
                             type="text"
                             placeholder="Ecommerce subreddit feed"
-                            v-bind="componentField"
+                            v-bind="titleFieldAttrs"
+                            v-model="titleField"
                         />
                     </FormControl>
-                    <FormDescription>
-                        This is your public display name.
-                    </FormDescription>
                     <FormMessage />
                 </FormItem>
             </FormField>
-            <FormField
-                v-if="props.users.length > 0"
-                v-slot="{ componentField }"
-                name="author_email"
-            >
+            <br />
+            <FormField name="feed_type">
                 <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Feed Type</FormLabel>
 
-                    <Select v-bind="componentField">
+                    <Select v-model="feedTypeField" v-bind="feedTypeFieldAttrs">
                         <FormControl>
                             <SelectTrigger>
                                 <SelectValue
-                                    placeholder="Select a verified email to display"
+                                    placeholder="Select the feed order"
                                 />
                             </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                             <SelectGroup>
-                                <SelectItem
-                                    v-for="user in props.users"
-                                    :key="user.email"
-                                    :value="user.email"
+                                <SelectItem key="new" value="new"
+                                    >New</SelectItem
                                 >
-                                    {{ user.email }}
-                                </SelectItem>
+                                <SelectItem key="popular" value="popular"
+                                    >Popular</SelectItem
+                                >
+                                <SelectItem key="gold" value="gold"
+                                    >Gold</SelectItem
+                                >
+                                <SelectItem key="default" value="default"
+                                    >Default</SelectItem
+                                >
                             </SelectGroup>
                         </SelectContent>
                     </Select>
-                    <FormDescription>
-                        You can manage email addresses in your
-                        <a href="/examples/forms">email settings</a>.
-                    </FormDescription>
                     <FormMessage />
                 </FormItem>
             </FormField>
-
-            <FormField v-slot="{ componentField }" name="subreddit_url">
+            <br />
+            <FormField name="subreddit_url">
                 <FormItem>
                     <FormLabel>Subreddit URL</FormLabel>
                     <FormControl>
                         <Input
                             type="text"
                             placeholder="Your subreddit URL"
-                            v-bind="componentField"
-                            v-model="props.feedData.subreddit_url"
+                            v-bind="subredditUrlFieldAttrs"
+                            v-model="subredditUrlField"
                         />
                     </FormControl>
                     <FormDescription>
@@ -202,7 +207,35 @@ async function createNewFeed(values) {
                     <FormMessage />
                 </FormItem>
             </FormField>
-            <div class="flex justify-start pt-2">
+            <br />
+            <FormField name="should_be_cached" v-slot="{ value, handleChange }">
+                <FormItem>
+                    <FormControl>
+                        <div class="flex items-center space-x-2 mt-4">
+                            <Checkbox
+                                id="should_be_cached"
+                                :checked="value"
+                                @update:checked="handleChange"
+                            />
+                            <div class="grid gap-1.5 leading-none">
+                                <label
+                                    for="terms1"
+                                    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                >
+                                    Cache this feed
+                                </label>
+                                <p class="text-sm text-muted-foreground">
+                                    Cache this feed for faster loading times.
+                                    And reduce API calls to reddit.
+                                </p>
+                            </div>
+                        </div>
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+            </FormField>
+            <br />
+            <div class="flex justify-start">
                 <Button type="submit" :disabled="state.isLoading">
                     <LoadingSpinner v-if="state.isLoading" /> Save
                 </Button>

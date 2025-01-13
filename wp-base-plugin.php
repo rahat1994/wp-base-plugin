@@ -1,5 +1,7 @@
 <?php
 
+use App\Common\PluginActivator;
+
 /**
  * Plugin Name: Wp Base Plugin
  * Plugin URI: http://github.com/rahat1994
@@ -31,10 +33,12 @@ class WpBasePlugin
     public array $CPTS = [];
     public array $shortCodes = [];
     public array $settingsPages = [];
-    public function __construct(AjaxHandler $apiHandler, LoadAssets $assetsLoader)
+    public PluginActivator $pluginActivator;
+    public function __construct(AjaxHandler $apiHandler, LoadAssets $assetsLoader, PluginActivator $pluginActivator)
     {
         $this->apiHandler = $apiHandler;
         $this->assetsLoader = $assetsLoader;
+        $this->pluginActivator = $pluginActivator;
     }
 
     public function boot()
@@ -76,7 +80,9 @@ class WpBasePlugin
 
     public function activatePlugin()
     {
-        register_activation_hook(__FILE__, function ($newWorkWide) {});
+        register_activation_hook(__FILE__, function ($netWorkWide) {
+            $this->pluginActivator->migrateDatabases($newWorkWide);
+        });
     }
 
     public function registerApiRoutes()

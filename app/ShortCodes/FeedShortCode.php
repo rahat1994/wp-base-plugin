@@ -42,15 +42,22 @@ class FeedShortCode implements ShortcodeInterface
             return '<div class="wprb-subreddit-rss">'.__('Missing feed attribute', 'wprb-subreddit-rss').'</div>';
         }
         
-        $rssUrl = $this->getSubredditRssUrl($shortcodeAtts['feed']);
+        $rssUrl = $this->getFeedMeta($shortcodeAtts['feed']);
 
         if(!$rssUrl){
             return '<div class="wprb-subreddit-rss">'.__('Invalid URL', 'wprb-subreddit-rss').'</div>';
         }
 
-        $xml = $this->getRssUrlContent($rssUrl);
+        
+        $feedType = $this->getFeedMeta($shortcodeAtts['feed'], '_wprb_feed_type');
+        $feedType = $feedType ? $feedType : 'new';
+        $subRedditName = $this->getSubredditName($rssUrl);
 
-        $feedData = $this->redditClient->getFeedData();
+        $feedData = $this->redditClient->getFeedData($subRedditName, $feedType );
+
+        if(!$feedData){
+            return '<div class="wprb-subreddit-rss">'.__('Invalid access token.', 'wprb-subreddit-rss').'</div>';
+        }
 
         if (count($feedData['data']['children']) == 0) {
             return '<div class="wprb-subreddit-rss">'.__('No feed data found', 'wprb-subreddit-rss').'</div>';
@@ -72,7 +79,7 @@ class FeedShortCode implements ShortcodeInterface
         return $post;
     }
 
-    public function getSubredditRssUrl(int $id, $meta_key = '_wprb_subreddit_url'){
+    public function getFeedMeta(int $id, $meta_key = '_wprb_subreddit_url'){
 
         $metaValue = get_post_meta($id, $meta_key, true);
 
@@ -96,6 +103,16 @@ class FeedShortCode implements ShortcodeInterface
 
         error_log('The xml string: '.$xmlString);
         return $xmlString;
+    }
+
+    public function getSubredditName($url){
+        // ex: https://www.reddit.com/r/ecommerce/
+
+        $urlParts = explode('/', $url);
+        $subRedditName = $urlParts[count($urlParts) - 2];
+
+        return $subRedditName;
+        
     }
 
 

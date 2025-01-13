@@ -4,6 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { Form, useForm } from "vee-validate";
 import LoadingSpinner from "../../loadingSpinner.vue";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
     FormControl,
     FormDescription,
@@ -68,6 +69,9 @@ const feedEditFormSchema = toTypedSchema(
             .min(2, {
                 message: "Title must be at least 2 characters.",
             }),
+        feed_type: z.string({
+            required_error: "Feed type is required.",
+        }),
         subreddit_url: z
             .string({
                 required_error: "Subreddit URL is required.",
@@ -75,17 +79,24 @@ const feedEditFormSchema = toTypedSchema(
             .regex(/^https:\/\/(www\.)?reddit\.com\/r\/[A-Za-z0-9_]+\/?$/, {
                 message: "Subreddit URL must be a valid URL to a subreddit.",
             }),
+        should_be_cached: z.boolean().default(false).optional(),
     })
 );
 
-const { handleSubmit } = useForm({
+const { handleSubmit, defineField } = useForm({
     validationSchema: feedEditFormSchema,
+    initialValues: props.feedData,
 });
 
-function onSubmit(values) {
+const [titleField, titleFieldAttrs] = defineField("title");
+const [feedTypeField, feedTypeFieldAttrs] = defineField("feed_type");
+const [subredditUrlField, subredditUrlFieldAttrs] =
+    defineField("subreddit_url");
+
+const onSubmit = handleSubmit((values) => {
     console.log(JSON.stringify(values, null, 2));
     editFeed(values);
-}
+});
 
 async function editFeed(values) {
     return new Promise(async (resolve) => {
@@ -124,87 +135,105 @@ async function editFeed(values) {
     <div>
         <Separator />
         <br />
-        <Form
-            v-slot="{ handleSubmit }"
-            :validation-schema="feedEditFormSchema"
-            :initial-values="props.feedData"
-        >
-            <form class="pt-2" @submit="handleSubmit($event, onSubmit)">
-                <FormField v-slot="{ componentField }" name="title">
-                    <FormItem>
-                        <FormLabel>Feed title</FormLabel>
-                        <FormControl>
-                            <Input
-                                type="text"
-                                placeholder="Ecommerce subreddit feed"
-                                v-bind="componentField"
-                            />
-                        </FormControl>
-                        <FormDescription>
-                            This is your public display name.
-                        </FormDescription>
-                        <FormMessage />
-                    </FormItem>
-                </FormField>
-                <FormField
-                    v-if="props.users.length > 0"
-                    v-slot="{ componentField }"
-                    name="author_email"
-                >
-                    <FormItem>
-                        <FormLabel>Email</FormLabel>
+        <form class="pt-2" @submit="onSubmit">
+            <FormField name="title">
+                <FormItem>
+                    <FormLabel>Feed title</FormLabel>
+                    <FormControl>
+                        <Input
+                            type="text"
+                            placeholder="Ecommerce subreddit feed"
+                            v-bind="titleFieldAttrs"
+                            v-model="titleField"
+                        />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+            </FormField>
+            <br />
+            <FormField name="feed_type">
+                <FormItem>
+                    <FormLabel>Feed Type</FormLabel>
 
-                        <Select v-bind="componentField">
-                            <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue
-                                        placeholder="Select a verified email to display"
-                                    />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectItem
-                                        v-for="user in props.users"
-                                        :key="user.email"
-                                        :value="user.email"
-                                    >
-                                        {{ user.email }}
-                                    </SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                        <FormDescription>
-                            You can manage email addresses in your
-                            <a href="/examples/forms">email settings</a>.
-                        </FormDescription>
-                        <FormMessage />
-                    </FormItem>
-                </FormField>
-
-                <FormField v-slot="{ componentField }" name="subreddit_url">
-                    <FormItem>
-                        <FormLabel>Subreddit URL</FormLabel>
+                    <Select v-model="feedTypeField" v-bind="feedTypeFieldAttrs">
                         <FormControl>
-                            <Input
-                                type="text"
-                                placeholder="Your subreddit URL"
-                                v-bind="componentField"
-                                v-model="props.feedData.subreddit_url"
-                            />
+                            <SelectTrigger>
+                                <SelectValue
+                                    placeholder="Select the feed order"
+                                />
+                            </SelectTrigger>
                         </FormControl>
-                        <FormDescription>
-                            This is the subreddit URL for your post.
-                        </FormDescription>
-                        <FormMessage />
-                    </FormItem>
-                </FormField>
-                <div class="flex justify-start pt-2">
-                    <Button type="submit" :disabled="state.isLoading">
-                        <LoadingSpinner v-if="state.isLoading" /> Save
-                    </Button>
-                </div>
-            </form>
-        </Form>
+                        <SelectContent>
+                            <SelectGroup>
+                                <SelectItem key="new" value="new"
+                                    >New</SelectItem
+                                >
+                                <SelectItem key="popular" value="popular"
+                                    >Popular</SelectItem
+                                >
+                                <SelectItem key="gold" value="gold"
+                                    >Gold</SelectItem
+                                >
+                                <SelectItem key="default" value="default"
+                                    >Default</SelectItem
+                                >
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+            </FormField>
+            <br />
+            <FormField name="subreddit_url">
+                <FormItem>
+                    <FormLabel>Subreddit URL</FormLabel>
+                    <FormControl>
+                        <Input
+                            type="text"
+                            placeholder="Your subreddit URL"
+                            v-bind="subredditUrlFieldAttrs"
+                            v-model="subredditUrlField"
+                        />
+                    </FormControl>
+                    <FormDescription>
+                        This is the subreddit URL for your post.
+                    </FormDescription>
+                    <FormMessage />
+                </FormItem>
+            </FormField>
+            <br />
+            <FormField name="should_be_cached" v-slot="{ value, handleChange }">
+                <FormItem>
+                    <FormControl>
+                        <div class="flex items-center space-x-2 mt-4">
+                            <Checkbox
+                                id="should_be_cached"
+                                :checked="value"
+                                @update:checked="handleChange"
+                            />
+                            <div class="grid gap-1.5 leading-none">
+                                <label
+                                    for="terms1"
+                                    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                >
+                                    Cache this feed
+                                </label>
+                                <p class="text-sm text-muted-foreground">
+                                    Cache this feed for faster loading times.
+                                    And reduce API calls to reddit.
+                                </p>
+                            </div>
+                        </div>
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+            </FormField>
+            <br />
+            <div class="flex justify-start pt-2">
+                <Button type="submit" :disabled="state.isLoading">
+                    <LoadingSpinner v-if="state.isLoading" /> Save
+                </Button>
+            </div>
+        </form>
     </div>
 </template>

@@ -35,16 +35,16 @@ trait CanInteractWithFeedCPT
     }
 
     public function create($data){
-        $post_id = FeedRepository::createPost($data);
-        return $post_id;
+        return FeedRepository::createPost($data);
+        
     }
 
     public function updateFeed($id, $data){
        return FeedRepository::updatePost($id, $data);
     }
 
-    public function delete($id){
-
+    public function deleteFeedPost($id){
+        return FeedRepository::deletePost($id);
     }
 
     public function getAll(){

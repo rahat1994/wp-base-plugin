@@ -21,6 +21,7 @@
             <DeleteSheetContent
                 v-else-if="props.type === 'delete'"
                 :data="props.data"
+                @feedDeleted="handleFormSubmissionSuccess"
             />
         </SheetContent>
     </Sheet>

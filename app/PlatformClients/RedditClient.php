@@ -50,7 +50,7 @@ class RedditClient
 
         $tokenData = json_decode($response, true);
         if (!isset($tokenData['access_token'])) {
-            die('Error: Invalid response for access token.');
+            return false;
         }
 
         $accessToken = $tokenData['access_token'];
@@ -58,11 +58,14 @@ class RedditClient
         return $accessToken;
     }
 
-    public function getFeedData(){
+    public function getFeedData($subRedditName = 'ecommerce', $feedType = 'new'){
         $accessToken = $this->getAccessToken();
 
-        $subreddit = 'ecommerce';
-        $feedUrl = "https://oauth.reddit.com/r/$subreddit/new";
+        if(!$accessToken){
+            return false;
+        }
+
+        $feedUrl = "https://oauth.reddit.com/r/$subRedditName/$feedType";
         $feedHeaders = [
             'Authorization: Bearer ' . $accessToken,
             'User-Agent: ' . $this->userAgent

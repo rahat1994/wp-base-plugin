@@ -43,22 +43,21 @@ const formDefination = () => {
             clientId: "",
             clientSecret: "",
         },
-    }
-}
+    };
+};
 
-const { values,resetForm, handleSubmit, isSubmitting, errors, defineField } = useForm(formDefination());
+const { values, resetForm, handleSubmit, isSubmitting, errors, defineField } =
+    useForm(formDefination());
 
 const state = reactive({
     isLoading: false,
     error: null,
 });
 
-
-
 const [clientIdField, clientIdFieldAttrs] = defineField("clientId");
 const [clientSecretField, clientSecretFieldAttrs] = defineField("clientSecret");
 
-const onSubmit = handleSubmit(values => {    
+const onSubmit = handleSubmit((values) => {
     return new Promise(async (resolve) => {
         try {
             state.isLoading = true;
@@ -90,7 +89,7 @@ const onSubmit = handleSubmit(values => {
             resolve();
         }
     });
-}) 
+});
 
 async function getSettings() {
     return new Promise(async (resolve) => {
@@ -114,7 +113,6 @@ async function getSettings() {
                 }
                 console.log(data.value.data.data);
                 hydrateForm(JSON.parse(data.value.data.data));
-                
             } else if (fetchError) {
                 state.error = fetchError;
             }
@@ -130,21 +128,17 @@ async function getSettings() {
 const hydrateForm = (data) => {
     console.log(data.client_id);
     console.log("This is hydrate form");
-    
+
     resetForm({
         values: {
             clientId: data.client_id,
             clientSecret: data.client_secret,
         },
     });
-}
+};
 onMounted(async () => {
     getSettings();
 });
-
-
-
-
 </script>
 
 <template>
@@ -159,11 +153,7 @@ onMounted(async () => {
             </p>
         </div>
         <Separator />
-        <form
-            class="space-y-8"
-            @submit="onSubmit"
-            
-        >
+        <form class="space-y-8" @submit="onSubmit">
             <FormField name="clientId">
                 <FormItem>
                     <FormLabel>Client ID</FormLabel>
@@ -203,11 +193,12 @@ onMounted(async () => {
             </FormField>
 
             <div class="flex justify-start">
-                
-                <Button type="submit" @disabled="isSubmitting || state.isLoading">
+                <Button
+                    type="submit"
+                    @disabled="isSubmitting || state.isLoading"
+                >
                     <LoadingSpinner v-if="isSubmitting || state.isLoading" />
-                     Update secrets 
-                     
+                    Update secrets
                 </Button>
             </div>
         </form>

@@ -7,6 +7,11 @@ use App\Repositories\BaseRepository;
 class FeedRepository extends BaseRepository
 {
     public static $postType = 'subreddit_feed';
+    public static $publicMetas = [
+        '_wprb_subreddit_url',
+        '_wprb_feed_type',
+        '_wprb_should_be_cached',
+    ];
 
     public static function getPosts($args = [])
     {
@@ -29,18 +34,42 @@ class FeedRepository extends BaseRepository
         if ($query->have_posts()) {
             while ($query->have_posts()) {
                 $query->the_post();
-                $posts[] = [
+                $publicMetas = self::getAllPublicMetaValuesOfThePost(get_the_ID());
+                $posts[] = array_merge([
                     'id'     => get_the_ID(),
                     'title'  => get_the_title(),
                     'status' => get_post_status(),
                     'author' => get_the_author(),
-                    'subreddit_url'  => get_post_meta(get_the_ID(), '_wprb_subreddit_url', true),
-                ];
+                    
+                ], $publicMetas);
             }
             wp_reset_postdata();
         }
 
         return $posts;
+    }
+
+    public static function getAllPublicMetaValuesOfThePost($id){
+        // 'subreddit_url'  => get_post_meta(get_the_ID(), '_wprb_subreddit_url', true),
+        $metas = get_post_meta($id);
+        $publicMetas = [];
+
+        foreach (self::$publicMetas as $value) {
+            if($value === '_wprb_should_be_cached'){
+                $publicMetas['should_be_cached'] = $metas[$value][0] === 'true' ? true : false;
+                continue;
+            }
+            else if($value === '_wprb_feed_type'){
+                $publicMetas['feed_type'] = $metas[$value][0];
+                continue;
+            }
+            else if($value === '_wprb_subreddit_url'){
+                $publicMetas['subreddit_url'] = $metas[$value][0];
+                continue;
+            }
+        }
+
+        return $publicMetas;
     }
 
     public static function getPostByID($post_id)
@@ -53,6 +82,8 @@ class FeedRepository extends BaseRepository
         $query = new \WP_Query($args);
 
         $post = $query->have_posts() ? $query->posts[0] : null;
+
+        return $post;
     }
 
     public function get_posts_by_meta($meta_key, $meta_value)
@@ -75,7 +106,6 @@ class FeedRepository extends BaseRepository
         $post_id = wp_insert_post([
             'post_title'   => $data['post_title'],
             'post_status'  => 'publish',
-            'post_author'  => $data['post_author'],
             'post_type'    => self::$postType,
         ]);
 
@@ -119,6 +149,11 @@ class FeedRepository extends BaseRepository
         ]);
 
         return $query->found_posts;
+    }
+
+    public static function deletePost($post_id)
+    {
+        return wp_delete_post($post_id, true);
     }
 }
 

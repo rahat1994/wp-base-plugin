@@ -1,3 +1,72 @@
+<script setup>
+import { ref, defineProps, defineEmits, reactive } from "vue";
+import { Button } from "@/components/ui/button";
+import {
+    Sheet,
+    SheetClose,
+    SheetContent,
+    SheetDescription,
+    SheetFooter,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "@/components/ui/sheet";
+import { $post } from "@/request";
+import LoadingSpinner from "../../loadingSpinner.vue";
+const props = defineProps({
+    data: {
+        type: Object,
+        required: false,
+    },
+});
+
+const state = reactive({
+    isLoading: false,
+    error: null,
+});
+const emit = defineEmits(["feedDeleted"]);
+
+const confirmDelete = () => {
+    // Logic to confirm deletion
+    console.log("Deletion confirmed");
+    deleteFeed();
+};
+
+const cancelDelete = () => {
+    // Logic to cancel deletion
+    console.log("Deletion cancelled");
+};
+
+async function deleteFeed() {
+    return new Promise(async (resolve) => {
+        try {
+            state.isLoading = true;
+            state.error = null;
+            const args = {
+                route: "delete-feed",
+                id: props.data.id,
+            };
+            console.log("deleteFeed");
+            const { data, error: fetchError } = await $post(args);
+            if (data && data.value) {
+                if (!data.value.data.success) {
+                    state.error = data.value.data.message;
+                    return;
+                }
+                emit("feedDeleted");
+            } else if (fetchError) {
+                state.error = fetchError;
+            }
+        } catch (err) {
+            state.error = err;
+            console.log(err);
+        } finally {
+            state.isLoading = false;
+            resolve();
+        }
+    });
+}
+</script>
 <template>
     <div>
         <SheetHeader class="mb-4">
@@ -17,35 +86,11 @@
                 @click="confirmDelete"
                 class="px-4 py-2"
             >
+                <LoadingSpinner v-if="state.isLoading" />
                 Yes, Delete
             </Button>
         </SheetFooter>
     </div>
 </template>
-
-<script setup>
-import { ref } from "vue";
-import { Button } from "@/components/ui/button";
-import {
-    Sheet,
-    SheetClose,
-    SheetContent,
-    SheetDescription,
-    SheetFooter,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from "@/components/ui/sheet";
-
-const confirmDelete = () => {
-    // Logic to confirm deletion
-    console.log("Content deleted");
-};
-
-const cancelDelete = () => {
-    // Logic to cancel deletion
-    console.log("Deletion cancelled");
-};
-</script>
 
 <style scoped></style>

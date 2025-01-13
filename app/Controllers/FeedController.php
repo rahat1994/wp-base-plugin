@@ -16,6 +16,13 @@ class FeedController extends BaseController {
     use CanInteractWithFeedCPT;
     use CanInteractWithUsers;
 
+    public array $acceptedFeedTypes = [
+        'new',
+        'popular',
+        'gold',
+        'default'
+    ];
+
     public function index(){
 
         try {
@@ -74,35 +81,63 @@ class FeedController extends BaseController {
         }
     }
 
-    public function store(){
-
-        $_POST['title'] = sanitize_text_field($_POST['title']);
-        $_POST['subreddit_url'] = sanitize_url($_POST['subreddit_url']);
-        $_POST['author_email'] = sanitize_email($_POST['author_email']);
-
-        if (empty($_POST['title']) || empty($_POST['subreddit_url']) || empty($_POST['author_email'])) {
+    public function validateFormInput(){
+        if (empty($_POST['id']) || empty($_POST['title']) || empty($_POST['subreddit_url']) || empty($_POST['feed_type']) || empty($_POST['should_be_cached'])) {
             wp_send_json_success([
                 'success' => false,
                 'feed'    => 'All fields are required!',
             ]);
         }
 
+        if(in_array($_POST['feed_type'], $this->acceptedFeedTypes, true) === false){
+            wp_send_json_success([
+                'success' => false,
+                'feed'    => 'Feed type is not accepted!',
+            ]);
+        }
+
+        if($_POST['should_be_cached'] !== 'true' && $_POST['should_be_cached'] !== 'false'){
+            wp_send_json_success([
+                'success' => false,
+                'feed'    => 'Should be cached field is not accepted!',
+            ]);
+
+        }
+        return true;
+    }
+
+    public function store(){
+
+        $_POST['title'] = sanitize_text_field($_POST['title']);
+        $_POST['feed_type'] = sanitize_text_field($_POST['feed_type']);
+        $_POST['subreddit_url'] = sanitize_url($_POST['subreddit_url']);
+        $_POST['should_be_cached'] = sanitize_text_field($_POST['should_be_cached']);
+
+        $this->validateFormInput();
+
         // TODO: Further validation.
 
         try {
-            $user = $this->getUserByEmail($_POST['email']);
 
             $data = [
                 'post_title' => $_POST['title'],
                 'post_status' => 'publish',
                 'post_type' => 'subreddit_feed',
-                'post_author' => $user['id'],
                 'meta'=> [
                     '_wprb_subreddit_url' => $_POST['subreddit_url'],
+                    '_wprb_feed_type' => $_POST['feed_type'],
+                    '_wprb_should_be_cached' => $_POST['should_be_cached'],
                 ]
             ];
 
             $feed = $this->create($data);
+
+            if(!$feed){
+                wp_send_json_success([
+                    'success' => false,
+                    'feed'    => 'Feed could not be created!',
+                ]);
+            }
 
             wp_send_json_success([
                 'success' => true,
@@ -117,24 +152,7 @@ class FeedController extends BaseController {
     }
 
     public function update(){
-        
-        if (!isset($_POST['id'], $_POST['title'], $_POST['subreddit_url'])) {
-            wp_send_json_success([
-            'success' => false,
-            'feed'    => 'All fields are required!',
-            ]);
-        }
-
-        $_POST['id'] = sanitize_text_field($_POST['id']);
-        $_POST['title'] = sanitize_text_field($_POST['title']);
-        $_POST['subreddit_url'] = sanitize_url($_POST['subreddit_url']);
-
-        if (empty($_POST['title']) || empty($_POST['subreddit_url'])) {
-            wp_send_json_success([
-                'success' => false,
-                'feed'    => 'All fields are required!',
-            ]);
-        }
+         $this->validateFormInput();
 
         try {
 
@@ -142,6 +160,8 @@ class FeedController extends BaseController {
                 'post_title' => $_POST['title'],
                 'meta'=> [
                     '_wprb_subreddit_url' => $_POST['subreddit_url'],
+                    '_wprb_feed_type' => $_POST['feed_type'],
+                    '_wprb_should_be_cached' => $_POST['should_be_cached'],
                 ]
             ];
 
@@ -162,7 +182,29 @@ class FeedController extends BaseController {
 
     }
     public function delete(){
-        
+        if (empty($_POST['id'])) {
+            wp_send_json_success([
+                'success' => false,
+                'feed'    => 'POST ID is required!',
+            ]);
+        }
+
+        $_POST['id'] = sanitize_text_field($_POST['id']);
+
+        try {
+            $this->deleteFeedPost($_POST['id']);
+
+            wp_send_json_success([
+                'success' => true,
+                'feed'    => 'Feed deleted successfully!',
+            ]);
+        } catch (\Exception $e) {
+            wp_send_json_success([
+                'success' => false,
+                'feed'    => $e->getMessage(),
+            ]);
+        }
+
     }
     
 }

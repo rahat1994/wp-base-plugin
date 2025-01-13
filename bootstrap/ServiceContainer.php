@@ -2,6 +2,7 @@
 
 use App\Common\AjaxHandler;
 use App\Common\LoadAssets;
+use App\Common\PluginActivator;
 use App\Common\Router;
 use App\CPT\FeedCPT;
 use App\Interfaces\Commons\ApiHandlerInterface;
@@ -30,7 +31,7 @@ class ServiceContainer
         $this->container->add(AjaxHandler::class)->addArgument(Router::class);
         
         $this->container->add(WpBasePlugin::class)
-            ->addArguments([AjaxHandler::class, LoadAssets::class])
+            ->addArguments([AjaxHandler::class, LoadAssets::class, PluginActivator::class])
             ->addMethodCall('setShortCodes', [$this->getShortCodes()]);
         $this->container->add(FeedCPT::class);
         $this->container->add(UrlValidator::class);
