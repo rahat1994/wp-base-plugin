@@ -53,7 +53,10 @@ class FeedShortCode implements ShortcodeInterface
         $feedType = $feedType ? $feedType : 'new';
         $subRedditName = $this->getSubredditName($rssUrl);
 
-        $feedData = $this->redditClient->getFeedData($subRedditName, $feedType );
+        $subredditData = $this->redditClient->getSubredditHTML($subRedditName, $feedType );
+
+        $feedData = $subredditData['feedData'];
+        $subRedditinfo = $subredditData['subRedditInfo'];
 
         if(!$feedData){
             return '<div class="wprb-subreddit-rss">'.__('Invalid access token.', 'wprb-subreddit-rss').'</div>';
@@ -63,16 +66,90 @@ class FeedShortCode implements ShortcodeInterface
             return '<div class="wprb-subreddit-rss">'.__('No feed data found', 'wprb-subreddit-rss').'</div>';
         }
 
-        $links = '<ul>';
+        $feedConfig = $this->getFeedConfig($shortcodeAtts['feed']);
+        $subredditMetaHtml = $this->getSubredditMetaHTML($subRedditinfo, $feedConfig);
+        $links = $this->getFeedLInks($feedData,$feedConfig);
+
+        return '<div class="wprb-subreddit-posts">'.$subredditMetaHtml.$links.'</div>';
+    }
+
+    public function getSubredditMetaHTML($subRedditInfo, $feedConfig){
+        $title = $subRedditInfo['data']['title'];
+        $description = $subRedditInfo['data']['public_description'];
+
+        // Array
+// (
+//     [title] => Array
+//         (
+//             [show] => 1
+//             [tag] => h1
+//             [classes] => 
+//         )
+
+//     [description] => Array
+//         (
+//             [show] => 
+//             [tag] => p
+//             [classes] => 
+//         )
+
+//     [list] => Array
+//         (
+//             [show] => 1
+//             [tag] => ol
+//             [classes] => 
+//         )
+
+//     [links] => Array
+//         (
+//             [tag] => a
+//             [classes] => 
+//         )
+
+// )
+
+        $titleHTML = '';
+        if (isset($feedConfig['title']['show']) && $feedConfig['title']['show']) {
+            $tag = isset($feedConfig['title']['tag']) ? $feedConfig['title']['tag'] : 'h2';
+            $classes = isset($feedConfig['title']['classes']) ? $feedConfig['title']['classes'] : '';
+            $titleHTML = '<' . esc_html($tag) . ' class="' . esc_attr($classes) . '">' . esc_html($title) . '</' . esc_html($tag) . '>';
+        }
+
+        $descriptionHTML = '';
+        if (isset($feedConfig['description']['show']) && $feedConfig['description']['show']) {
+            $tag = isset($feedConfig['description']['tag']) ? $feedConfig['description']['tag'] : 'p';
+            $classes = isset($feedConfig['description']['classes']) ? $feedConfig['description']['classes'] : '';
+            $descriptionHTML = '<' . esc_html($tag) . ' class="' . esc_attr($classes) . '">' . esc_html($description) . '</' . esc_html($tag) . '>';
+        }
+
+        return '<div class="wprb-subreddit-meta">'.$titleHTML.$descriptionHTML.'</div>';
+    }
+
+    public function getFeedLInks($feedData, $feedConfig){
+
+
+        $links = '';
+
+        if (isset($feedConfig['list']['show']) && $feedConfig['list']['show']) {
+            $listTag = isset($feedConfig['list']['tag']) ? $feedConfig['list']['tag'] : 'ul';
+            $listClasses = isset($feedConfig['list']['classes']) ? $feedConfig['list']['classes'] : '';
+            $links = '<' . esc_html($listTag) . ' class="' . esc_attr($listClasses) . '">';
+        }
 
         foreach ($feedData['data']['children'] as $feed) {
-            
-            $links .= '<li><a href="'.esc_html($feed['data']['url']).'">'.esc_html($feed['data']['title']). '</a></li>';
-
+            $linkTag = isset($feedConfig['links']['tag']) ? $feedConfig['links']['tag'] : 'a';
+            $linkClasses = isset($feedConfig['links']['classes']) ? $feedConfig['links']['classes'] : '';
+            $links .= '<li><' . esc_html($linkTag) . ' href="' . esc_html($feed['data']['url']) . '" class="' . esc_attr($linkClasses) . '">' . esc_html($feed['data']['title']) . '</' . esc_html($linkTag) . '></li>';
         }
-        $links .= '</ul>';
-        return '<div>'. $links . '</div>';
+
+        if (isset($feedConfig['list']['show']) && $feedConfig['list']['show']) {
+            $links .= '</' . esc_html($listTag) . '>';
+        }
+
+        return '<div>' . $links . '</div>';
     }
+
+
 
     public function getFeedPostById($id){
         $post = get_post($id);
@@ -113,6 +190,15 @@ class FeedShortCode implements ShortcodeInterface
 
         return $subRedditName;
         
+    }
+
+    public function getFeedConfig($feedId){
+        $feedConfig = get_post_meta($feedId, '_wprb_feed_config', true);
+
+        if($feedConfig === ''){
+            $feedConfig = wprb_feed_default_config();
+        }
+        return json_decode($feedConfig, true);
     }
 
 

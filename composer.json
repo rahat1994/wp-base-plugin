@@ -5,7 +5,8 @@
             "App\\": "app/"
         },
         "files": [
-            "bootstrap/ServiceContainer.php"
+            "bootstrap/ServiceContainer.php",
+            "helpers/helpers.php"
         ]
     },
     "authors": [

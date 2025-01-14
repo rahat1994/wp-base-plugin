@@ -37,7 +37,7 @@ class EditorController {
         $feed = sanitize_text_field($_POST['feed']);
         $config = sanitize_text_field($_POST['config']);
 
-        update_post_meta($feed, 'wp_base_feed_config', $config);
+        update_post_meta($feed, '_wprb_feed_config', $config);
 
         return wp_send_json_success([
             'success' => true,
@@ -56,10 +56,10 @@ class EditorController {
 
         try {
             $feed = sanitize_text_field($_GET['feed']);
-            $config = get_post_meta($feed, 'wp_base_feed_config', true);
+            $config = get_post_meta($feed, '_wprb_feed_config', true);
 
             if($config === ''){
-                $config = '{"title":{"show":true,"tag":"h2","classes":""},"description":{"show":true,"tag":"p","classes":""},"list":{"show":true,"tag":"ul","classes":""},"links":{"tag":"a","classes":""}}';
+                $config = wprb_feed_default_config();
             }
     
             return wp_send_json_success([

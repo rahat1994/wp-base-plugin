@@ -19,7 +19,11 @@ class RedditClient
     protected $clientSecret;
     protected $userAgent = 'rahatsplugin/1.0 by Rahat Baksh';
 
-    public function getSubredditInfoHTML($subRedditName = 'ecommerce', $feedType = 'new'){
+    public function getSubredditHTML($subRedditName = 'ecommerce', $feedType = 'new'){
+        $settings = $this->getSettings(['client_id', 'client_secret']);
+        $this->clientId = $settings['client_id'];
+        $this->clientSecret = $settings['client_secret'];
+
         $accessToken = $this->getAccessToken();
 
         if(!$accessToken){
@@ -29,13 +33,14 @@ class RedditClient
         $feedData = $this->getFeedData($subRedditName, $feedType, $accessToken);
         $subRedditInfo = $this->getSubredditInfo($subRedditName, $accessToken);
 
+        return [
+            'feedData' => $feedData,
+            'subRedditInfo' => $subRedditInfo
+        ];
+
     }
 
     public function getAccessToken(){
-
-        $settings = $this->getSettings(['client_id', 'client_secret']);
-        $this->clientId = $settings['client_id'];
-        $this->clientSecret = $settings['client_secret'];
         
         // Step 1: Get access token
         $authUrl = 'https://www.reddit.com/api/v1/access_token';
@@ -100,11 +105,6 @@ class RedditClient
     }
 
     public function getSubredditInfo($subRedditName = 'ecommerce', $accessToken){
-        $accessToken = $this->getAccessToken();
-
-        if(!$accessToken){
-            return false;
-        }
 
         $subRedditInfoUrl = "https://oauth.reddit.com/r/$subRedditName/about";
         $subRedditInfoHeaders = [
@@ -120,12 +120,15 @@ class RedditClient
         curl_close($ch);
 
         if ($subRedditInfoResponse === false) {
-            die('Error fetching subreddit info.');
+            // die('Error fetching subreddit info.');
+            return false;
         }
 
         $subRedditInfo = json_decode($subRedditInfoResponse, true);
 
         return $subRedditInfo;
     }
+
+    
 
 }

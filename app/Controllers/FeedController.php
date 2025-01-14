@@ -54,7 +54,7 @@ class FeedController extends BaseController {
                 'getpage'  => $_GET['page'],
             ]);
         } catch (\Exception $e) {
-            wp_send_json_success([
+            wp_send_json_error([
                 'success' => false,
                 'feeds'    => $e->getMessage(),
             ]);
@@ -64,7 +64,7 @@ class FeedController extends BaseController {
     public function show(){
 
         if (!isset($_GET['id'])) {
-            wp_send_json_success([
+            wp_send_json_error([
                 'success' => false,
                 'feed'    => 'Feed ID is required!',
             ]);
@@ -80,7 +80,7 @@ class FeedController extends BaseController {
                 'feed'    => json_encode($feed),
             ]);
         } catch (\Exception $e) {
-            wp_send_json_success([
+            wp_send_json_error([
                 'success' => false,
                 'feed'    => $e->getMessage(),
             ]);
@@ -89,21 +89,21 @@ class FeedController extends BaseController {
 
     public function validateCreateFormInput(){
         if (empty($_POST['title']) || empty($_POST['subreddit_url']) || empty($_POST['feed_type']) || empty($_POST['should_be_cached'])) {
-            wp_send_json_success([
+            wp_send_json_error([
                 'success' => false,
                 'feed'    => 'All fields are required!',
             ]);
         }
 
         if(in_array($_POST['feed_type'], $this->acceptedFeedTypes, true) === false){
-            wp_send_json_success([
+            wp_send_json_error([
                 'success' => false,
                 'feed'    => 'Feed type is not accepted!',
             ]);
         }
 
         if($_POST['should_be_cached'] !== 'true' && $_POST['should_be_cached'] !== 'false'){
-            wp_send_json_success([
+            wp_send_json_error([
                 'success' => false,
                 'feed'    => 'Should be cached field is not accepted!',
             ]);
@@ -114,21 +114,21 @@ class FeedController extends BaseController {
 
     public function validateEditFormInput(){
         if (empty($_POST['id']) || empty($_POST['title']) || empty($_POST['subreddit_url']) || empty($_POST['feed_type']) || empty($_POST['should_be_cached'])) {
-            wp_send_json_success([
+            wp_send_json_error([
                 'success' => false,
                 'feed'    => 'All fields are required!',
             ]);
         }
 
         if(in_array($_POST['feed_type'], $this->acceptedFeedTypes, true) === false){
-            wp_send_json_success([
+            wp_send_json_error([
                 'success' => false,
                 'feed'    => 'Feed type is not accepted!',
             ]);
         }
 
         if($_POST['should_be_cached'] !== 'true' && $_POST['should_be_cached'] !== 'false'){
-            wp_send_json_success([
+            wp_send_json_error([
                 'success' => false,
                 'feed'    => 'Should be cached field is not accepted!',
             ]);
@@ -164,7 +164,7 @@ class FeedController extends BaseController {
             $feed = $this->create($data);
 
             if(!$feed){
-                wp_send_json_success([
+                wp_send_json_error([
                     'success' => false,
                     'feed'    => 'Feed could not be created!',
                 ]);
@@ -175,7 +175,7 @@ class FeedController extends BaseController {
                 'feed'    => 'Feed created successfully!',
             ]);
         } catch (\Exception $e) {
-            wp_send_json_success([
+            wp_send_json_error([
                 'success' => false,
                 'feed'    => $e->getMessage(),
             ]);
@@ -198,17 +198,15 @@ class FeedController extends BaseController {
 
             $feed = $this->updateFeed($_POST['id'], $data);
 
-            wp_send_json_success([
+            wp_send_json_error([
                 'success' => true,
                 'feed'    => 'Feed updated successfully!',
             ]);
         } catch (\Exception $e) {
-            wp_send_json_success([
+            wp_send_json_error([
                 'success' => false,
                 'feed'    => $e->getMessage(),
             ]);
-        } catch (\Throwable $th) {
-            //throw $th;
         }
 
     }
@@ -230,7 +228,7 @@ class FeedController extends BaseController {
                 'feed'    => 'Feed deleted successfully!',
             ]);
         } catch (\Exception $e) {
-            wp_send_json_success([
+            wp_send_json_error([
                 'success' => false,
                 'feed'    => $e->getMessage(),
             ]);
@@ -240,9 +238,9 @@ class FeedController extends BaseController {
 
     public function changeStatus(){
         if (empty($_POST['id']) || empty($_POST['status'])) {
-            wp_send_json_success([
+            wp_send_json_error([
                 'success' => false,
-                'feed'    => 'post id and status is required!',
+                'feed'    => 'post id and status are required!',
             ]);
         }
 
@@ -250,7 +248,7 @@ class FeedController extends BaseController {
         $_POST['status'] = sanitize_text_field($_POST['status']);
 
         if(in_array($_POST['status'], $this->acceptedStatuses, true) === false){
-            wp_send_json_success([
+            wp_send_json_error([
                 'success' => false,
                 'feed'    => 'Status is not accepted!',
             ]);
@@ -264,7 +262,7 @@ class FeedController extends BaseController {
                 'feed'    => 'Feed status changed successfully!',
             ]);
         } catch (\Exception $e) {
-            wp_send_json_success([
+            wp_send_json_error([
                 'success' => false,
                 'feed'    => $e->getMessage(),
             ]);
@@ -289,7 +287,7 @@ class FeedController extends BaseController {
                 'feed'    => 'Cache regenerated successfully!',
             ]);
         } catch (\Exception $e) {
-            wp_send_json_success([
+            wp_send_json_error([
                 'success' => false,
                 'feed'    => $e->getMessage(),
             ]);
