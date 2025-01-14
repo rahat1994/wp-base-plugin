@@ -1,9 +1,8 @@
 <script setup>
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Progress } from "@/components/ui/progress";
 import { useForm } from "vee-validate";
-import LoadingSpinner from "../../loadingSpinner.vue";
+import LoadingSpinner from "../../LoadingSpinner.vue";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import {

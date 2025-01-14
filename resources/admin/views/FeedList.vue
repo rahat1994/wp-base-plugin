@@ -22,17 +22,9 @@ export default {
         <Tabs default-value="feeds" class="space-y-4">
             <TabsList>
                 <TabsTrigger value="feeds"> Overview </TabsTrigger>
-                <TabsTrigger value="analytics"> Analytics </TabsTrigger>
-                <TabsTrigger value="reports" disabled> Reports </TabsTrigger>
-                <TabsTrigger value="notifications" disabled>
-                    Notifications
-                </TabsTrigger>
             </TabsList>
             <TabsContent value="feeds" class="space-y-4">
                 <FeedTable />
-            </TabsContent>
-            <TabsContent value="analytics" class="space-y-4">
-                <p>Coming Soon!!!</p>
             </TabsContent>
         </Tabs>
     </div>

@@ -19,11 +19,6 @@ const sidebarNavItems = [
         key: "reddit_secrets",
         icon: "reddit",
     },
-    {
-        title: "Theme Constants",
-        key: "theme_constants",
-        icon: "theme",
-    },
 ];
 </script>
 

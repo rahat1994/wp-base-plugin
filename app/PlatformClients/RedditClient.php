@@ -19,6 +19,18 @@ class RedditClient
     protected $clientSecret;
     protected $userAgent = 'rahatsplugin/1.0 by Rahat Baksh';
 
+    public function getSubredditInfoHTML($subRedditName = 'ecommerce', $feedType = 'new'){
+        $accessToken = $this->getAccessToken();
+
+        if(!$accessToken){
+            return false;
+        }
+
+        $feedData = $this->getFeedData($subRedditName, $feedType, $accessToken);
+        $subRedditInfo = $this->getSubredditInfo($subRedditName, $accessToken);
+
+    }
+
     public function getAccessToken(){
 
         $settings = $this->getSettings(['client_id', 'client_secret']);
@@ -45,7 +57,7 @@ class RedditClient
         curl_close($ch);
 
         if ($response === false) {
-            die('Error fetching access token.');
+            return false;
         }
 
         $tokenData = json_decode($response, true);
@@ -58,7 +70,7 @@ class RedditClient
         return $accessToken;
     }
 
-    public function getFeedData($subRedditName = 'ecommerce', $feedType = 'new'){
+    public function getFeedData($subRedditName = 'ecommerce', $feedType = 'new', $accessToken){
         $accessToken = $this->getAccessToken();
 
         if(!$accessToken){
@@ -85,6 +97,35 @@ class RedditClient
         $feedData = json_decode($feedResponse, true);
 
         return $feedData;
+    }
+
+    public function getSubredditInfo($subRedditName = 'ecommerce', $accessToken){
+        $accessToken = $this->getAccessToken();
+
+        if(!$accessToken){
+            return false;
+        }
+
+        $subRedditInfoUrl = "https://oauth.reddit.com/r/$subRedditName/about";
+        $subRedditInfoHeaders = [
+            'Authorization: Bearer ' . $accessToken,
+            'User-Agent: ' . $this->userAgent
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $subRedditInfoUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $subRedditInfoHeaders);
+        $subRedditInfoResponse = curl_exec($ch);
+        curl_close($ch);
+
+        if ($subRedditInfoResponse === false) {
+            die('Error fetching subreddit info.');
+        }
+
+        $subRedditInfo = json_decode($subRedditInfoResponse, true);
+
+        return $subRedditInfo;
     }
 
 }

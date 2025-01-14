@@ -16,7 +16,7 @@ import { reactive, onMounted } from "vue";
 import * as z from "zod";
 import { $get, $post } from "@/request";
 import { useForm } from "vee-validate";
-import LoadingSpinner from "@/components/native/loadingSpinner.vue";
+import LoadingSpinner from "@/components/native/LoadingSpinner.vue";
 const secretsFormSchema = toTypedSchema(
     z.object({
         clientId: z

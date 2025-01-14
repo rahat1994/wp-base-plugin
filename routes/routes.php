@@ -13,5 +13,7 @@ $router->post('settings', "SettingController@store");
 
 $router->get('users', "UsersController@index");
 $router->get('editor-get-feed', "EditorController@getFeed");
+$router->post('editor-save-feed-config', "EditorController@saveFeedConfig");
+$router->get('editor-get-feed-config', "EditorController@getFeedConfig");
 
 

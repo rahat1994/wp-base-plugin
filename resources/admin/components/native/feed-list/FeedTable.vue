@@ -2,7 +2,7 @@
 import { onMounted, ref, reactive } from "vue";
 import { columns } from "./columns.js";
 import DataTable from "./DataTable.vue";
-import { $get, $post } from "@/request";
+import { $get } from "@/request";
 import { Button } from "@/components/ui/button";
 import {
     Pagination,

@@ -12,7 +12,7 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet";
 import { $post } from "@/request";
-import LoadingSpinner from "../../loadingSpinner.vue";
+import LoadingSpinner from "../../LoadingSpinner.vue";
 const props = defineProps({
     data: {
         type: Object,

@@ -87,7 +87,32 @@ class FeedController extends BaseController {
         }
     }
 
-    public function validateFormInput(){
+    public function validateCreateFormInput(){
+        if (empty($_POST['title']) || empty($_POST['subreddit_url']) || empty($_POST['feed_type']) || empty($_POST['should_be_cached'])) {
+            wp_send_json_success([
+                'success' => false,
+                'feed'    => 'All fields are required!',
+            ]);
+        }
+
+        if(in_array($_POST['feed_type'], $this->acceptedFeedTypes, true) === false){
+            wp_send_json_success([
+                'success' => false,
+                'feed'    => 'Feed type is not accepted!',
+            ]);
+        }
+
+        if($_POST['should_be_cached'] !== 'true' && $_POST['should_be_cached'] !== 'false'){
+            wp_send_json_success([
+                'success' => false,
+                'feed'    => 'Should be cached field is not accepted!',
+            ]);
+
+        }
+        return true;
+    }
+
+    public function validateEditFormInput(){
         if (empty($_POST['id']) || empty($_POST['title']) || empty($_POST['subreddit_url']) || empty($_POST['feed_type']) || empty($_POST['should_be_cached'])) {
             wp_send_json_success([
                 'success' => false,
@@ -119,7 +144,7 @@ class FeedController extends BaseController {
         $_POST['subreddit_url'] = sanitize_url($_POST['subreddit_url']);
         $_POST['should_be_cached'] = sanitize_text_field($_POST['should_be_cached']);
 
-        $this->validateFormInput();
+        $this->validateCreateFormInput();
 
         // TODO: Further validation.
 
@@ -158,7 +183,7 @@ class FeedController extends BaseController {
     }
 
     public function update(){
-         $this->validateFormInput();
+         $this->validateEditFormInput();
 
         try {
 
