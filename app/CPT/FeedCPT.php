@@ -30,7 +30,7 @@ class FeedCPT implements CPTInterface
 	public function addShortCodeColumn($columns)
 	{
 
-		return array_merge($columns, array('shortcode' => __('Shortcode', 'subreddit-rss')));
+		return array_merge($columns, array('shortcode' => __('Shortcode', 'wp-base-plugin')));
 	}
 
 	public function product_custom_column_values($column, $post_id)
@@ -50,8 +50,8 @@ class FeedCPT implements CPTInterface
 			'subreddit_feed',
 			array(
 				'labels'      => array(
-					'name'          => __('Subreddit Feeds', 'wprb-subreddit-rss'),
-					'singular_name' => __('Subreddit Feed', 'wprb-subreddit-rss'),
+					'name'          => __('Subreddit Feeds', 'wp-base-plugin'),
+					'singular_name' => __('Subreddit Feed', 'wp-base-plugin'),
 				),
 				'public'      => true,
 				'has_archive' => true,
@@ -69,7 +69,7 @@ class FeedCPT implements CPTInterface
 		if (in_array($post_type, $post_types)) {
 			add_meta_box(
 				'subreddit_url',
-				__('Enter your subreddit URL', 'WPRBSubredditRSS'),
+				__('Enter your subreddit URL', 'wp-base-plugin'),
 				array($this, 'render_meta_box_content'),
 				$post_type,
 				'advanced',
@@ -90,7 +90,7 @@ class FeedCPT implements CPTInterface
 		// Display the form, using the current value.
 ?>
 		<label for="myplugin_new_field">
-			<?php _e('Subreddit URL', 'WPRBSubredditRSS'); ?>
+			<?php esc_html_e('Subreddit URL', 'wp-base-plugin'); ?>
 		</label>
 		<br />
 		<input type="text" id="wprb_subreddit_url" name="wprb_subreddit_url" value="<?php echo esc_attr($value); ?>" />

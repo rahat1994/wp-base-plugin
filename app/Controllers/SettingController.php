@@ -16,32 +16,32 @@ class SettingController extends BaseController
     {
 
         if (!isset($_GET['settingKeys'])) {
-            wp_send_json_success([
+            wp_send_json_error([
                 'success' => false,
                 'feed'    => 'settingKeys is required!',
             ]);
         }
-        $_GET['settingKeys'] = sanitize_text_field($_GET['settingKeys']);
-        $args = explode(',', $_GET['settingKeys']);
+        $settingKeys = sanitize_text_field(wp_unslash($_GET['settingKeys']));
+        $args = explode(',', $settingKeys);
 
         $settings = $this->getSettings($args);
         return wp_send_json_success([
             'success' => true,
-            'data'    => json_encode($settings),
+            'data'    => wp_json_encode($settings),
         ]);
     }
 
     public function store()
     {
         if (!isset($_POST['settings'])) {
-            wp_send_json_success([
+            wp_send_json_error([
                 'success' => false,
                 'settings'    => 'settings field is required!',
             ]);
         }
         try {
-            $_POST['settings'] = wp_unslash($_POST['settings']);
-            $args = json_decode(sanitize_text_field($_POST['settings']), true);
+            $settings = wp_unslash($_POST['settings']);
+            $args = json_decode(sanitize_text_field($settings), true);
 
             $settings = $this->getSettings(array_keys($args));
 
@@ -60,7 +60,7 @@ class SettingController extends BaseController
 
             throw new \Exception("Settings not added", 1);
         } catch (\Exception $e) {
-            wp_send_json_success([
+            wp_send_json_error([
                 'success' => false,
                 'settings'    => $e->getMessage(),
             ]);

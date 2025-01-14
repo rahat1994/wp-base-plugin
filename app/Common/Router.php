@@ -63,7 +63,7 @@ class Router
     public function direct($uri, $requestType)
     {
         if (!$uri) {
-            throw new \Exception('No route defined in this Reqeust.');
+            throw new \Exception( esc_html('No route defined in this Reqeust.'));
         }
         $validRoutes = in_array($uri, $this->routeNames);
 
@@ -77,7 +77,7 @@ class Router
 
             return $this->callAction(...$action);
         }
-        throw new \Exception('No route defined for this Routes : '  . $uri);
+        throw new \Exception(esc_html('No route defined for this Routes : '  . $uri));
     }
 
     /**
@@ -94,7 +94,7 @@ class Router
 
         if (! method_exists($controller, $action)) {
             throw new \Exception(
-                "{$controller} does not respond to the {$action} action."
+                esc_html("{$controller} does not respond to the {$action} action.")
             );
         }
         return $controller->$action();

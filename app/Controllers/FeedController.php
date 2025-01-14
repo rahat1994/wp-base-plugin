@@ -32,13 +32,13 @@ class FeedController extends BaseController {
     public function index(){
 
         try {
-            $_GET['page'] = sanitize_text_field($_GET['page']);
+
             $page = isset($_GET['page']) && 
-                    (0 !== $_GET['page']) ? 
-                    (int) $_GET['page'] : 1;
+            (0 !== sanitize_text_field(wp_unslash($_GET['page']))) ? 
+            (int) sanitize_text_field(wp_unslash($_GET['page'])) : 1;
                     
             if(isset($_GET['filterTitle'])){
-                $filterTitle = sanitize_text_field($_GET['filterTitle']);
+                $filterTitle = sanitize_text_field(wp_unslash($_GET['filterTitle']));
             }else{
                 $filterTitle = '';
             }
@@ -48,7 +48,7 @@ class FeedController extends BaseController {
 
             wp_send_json_success([
                 'success' => true,
-                'feeds'    => json_encode($feeds),
+                'feeds'    => wp_json_encode($feeds),
                 'total'    => $total,
                 'page'     => $page,
                 'getpage'  => $_GET['page'],
@@ -77,7 +77,7 @@ class FeedController extends BaseController {
 
             wp_send_json_success([
                 'success' => true,
-                'feed'    => json_encode($feed),
+                'feed'    => wp_json_encode($feed),
             ]);
         } catch (\Exception $e) {
             wp_send_json_error([

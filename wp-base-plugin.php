@@ -11,6 +11,7 @@ use App\Common\PluginActivator;
  * Version: 1.0.0
  * Text Domain: wp-base-plugin
  * Domain Path: /languages
+ * License: GPL2
  */
 define('PLUGIN_CONST_URL', plugin_dir_url(__FILE__));
 define('PLUGIN_CONST_DIR', plugin_dir_path(__FILE__));
@@ -126,7 +127,7 @@ class WpBasePlugin
         $this->assetsLoader->admin();
 
         $translatable = apply_filters('wp-base-plugin/frontend_translatable_strings', array(
-            'hello' => __('Hello', 'pluginslug'),
+            'hello' => __('Hello', 'wp-base-plugin'),
         ));
 
         $pluginlowercase = apply_filters('pluginlowercase/admin_app_vars', array(

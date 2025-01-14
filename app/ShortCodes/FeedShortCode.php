@@ -39,13 +39,13 @@ class FeedShortCode implements ShortcodeInterface
         );
 
         if ($shortcodeAtts['feed'] == null) {
-            return '<div class="wprb-subreddit-rss">'.__('Missing feed attribute', 'wprb-subreddit-rss').'</div>';
+            return '<div class="wp-base-notice">'.__('Missing feed attribute', 'wp-base-plugin').'</div>';
         }
         
         $rssUrl = $this->getFeedMeta($shortcodeAtts['feed']);
 
         if(!$rssUrl){
-            return '<div class="wprb-subreddit-rss">'.__('Invalid URL', 'wprb-subreddit-rss').'</div>';
+            return '<div class="wp-base-notice">'.__('Invalid URL', 'wp-base-plugin').'</div>';
         }
 
         
@@ -59,11 +59,11 @@ class FeedShortCode implements ShortcodeInterface
         $subRedditinfo = $subredditData['subRedditInfo'];
 
         if(!$feedData){
-            return '<div class="wprb-subreddit-rss">'.__('Invalid access token.', 'wprb-subreddit-rss').'</div>';
+            return '<div class="wp-base-plugin">'.__('Invalid access token.', 'wp-base-plugin').'</div>';
         }
 
         if (count($feedData['data']['children']) == 0) {
-            return '<div class="wprb-subreddit-rss">'.__('No feed data found', 'wprb-subreddit-rss').'</div>';
+            return '<div class="wp-base-plugin">'.__('No feed data found', 'wp-base-plugin').'</div>';
         }
 
         $feedConfig = $this->getFeedConfig($shortcodeAtts['feed']);

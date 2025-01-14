@@ -19,10 +19,10 @@ class UsersController extends BaseController {
             $authors = $this->getAllUsers();
             wp_send_json_success([
                 'success' => true,
-                'users'    => json_encode($authors),
+                'users'    => wp_json_encode($authors),
             ]);
         } catch (\Exception $e) {
-            wp_send_json_success([
+            wp_send_json_error([
                 'success' => false,
                 'users'    => $e->getMessage(),
             ]);
