@@ -55,8 +55,25 @@ trait CanInteractWithFeedCPT
         return FeedRepository::changePostStatus($id, $status);
     }   
 
-    public function regenerateFeedCache($id){
-        return FeedRepository::regenerateCache($id);
+    // public function regenerateFeedCache($id){
+    //     return FeedRepository::regenerateCache($id);
+    // }
+
+    public function getSubredditName($url){
+        // ex: https://www.reddit.com/r/ecommerce/
+
+        $urlParts = explode('/', $url);
+        $subRedditName = $urlParts[count($urlParts) - 2];
+
+        return $subRedditName;
+        
+    }
+
+    public function getFeedMeta(int $id, $meta_key = '_wprb_subreddit_url'){
+
+        $metaValue = get_post_meta($id, $meta_key, true);
+
+        return $metaValue;
     }
 
 }

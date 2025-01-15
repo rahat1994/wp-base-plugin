@@ -36,6 +36,7 @@ class PluginActivator implements PluginActivatorInterface
         $sql = "CREATE TABLE $table_name (
             id bigint(20) NOT NULL AUTO_INCREMENT,
             platform varchar(255) DEFAULT NULL,
+            post_id bigint(20) UNSIGNED NOT NULL,
             name varchar(255) DEFAULT NULL,
             value longtext DEFAULT NULL,
             expiration timestamp NULL DEFAULT NULL,

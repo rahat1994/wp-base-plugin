@@ -4,6 +4,7 @@
 
 namespace App\PlatformClients;
 
+use App\Repositories\PlatformCallCacheRepository;
 use App\Traits\CanInteractWithSettings;
 
 if (!defined('ABSPATH')) {
@@ -19,17 +20,49 @@ class RedditClient
     protected $clientSecret;
     protected $userAgent = 'rahatsplugin/1.0 by Rahat Baksh';
 
-    public function getSubredditHTML($subRedditName = 'ecommerce', $feedType = 'new'){
-        $settings = $this->getSettings(['client_id', 'client_secret']);
-        $this->clientId = $settings['client_id'];
-        $this->clientSecret = $settings['client_secret'];
+    public function getSubredditHTML($feedId,$subRedditName = 'ecommerce', $feedType = 'new', $shouldBeCached = true){
 
-        $accessToken = $this->getAccessToken();
-
-        if(!$accessToken){
-            return false;
+        if($shouldBeCached || $shouldBeCached === 'true'){
+            error_log('Cached');
+            $cachedData = PlatformCallCacheRepository::getCache($feedId);
+            error_log(wp_json_encode($cachedData));
+        } else{
+            error_log('Not cached');
+            $accessToken = $this->getAccessToken();
+            return $this->makeDataCall( $subRedditName, $feedType, $accessToken);
         }
 
+
+        if(!$cachedData || empty($cachedData) || count($cachedData) === 0){
+    
+            $accessToken = $this->getAccessToken();
+    
+            if(!$accessToken){
+                return false;
+            }
+    
+            $data = $this->makeDataCall($subRedditName, $feedType, $accessToken);
+
+            
+            if($shouldBeCached || $shouldBeCached === 'true'){
+                PlatformCallCacheRepository::createCache($feedId, 'feedData', wp_json_encode($data));
+            }
+            return $data;
+            // PlatformCallCacheRepository::createCache($feedId, 'feedData', wp_json_encode($data));
+        }else{
+            $data = json_decode($cachedData['value'], true);
+            $feedData = $data['feedData'];
+            $subRedditInfo = $data['subRedditInfo'];
+
+            return [
+                'feedData' => $feedData,
+                'subRedditInfo' => $subRedditInfo
+            ];
+        }
+
+    }
+
+    public function makeDataCall($subRedditName = 'ecommerce', $feedType = 'new', $accessToken){
         $feedData = $this->getFeedData($subRedditName, $feedType, $accessToken);
         $subRedditInfo = $this->getSubredditInfo($subRedditName, $accessToken);
 
@@ -37,11 +70,14 @@ class RedditClient
             'feedData' => $feedData,
             'subRedditInfo' => $subRedditInfo
         ];
-
     }
 
     public function getAccessToken(){
-        
+
+        $settings = $this->getSettings(['client_id', 'client_secret']);
+        $this->clientId = $settings['client_id'];
+        $this->clientSecret = $settings['client_secret'];
+
         // Step 1: Get access token
         $authUrl = 'https://www.reddit.com/api/v1/access_token';
         $authHeaders = [
@@ -83,6 +119,7 @@ class RedditClient
         }
 
         $feedUrl = "https://oauth.reddit.com/r/$subRedditName/$feedType";
+        
         $feedHeaders = [
             'Authorization: Bearer ' . $accessToken,
             'User-Agent: ' . $this->userAgent

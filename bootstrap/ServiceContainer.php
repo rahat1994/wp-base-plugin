@@ -5,8 +5,11 @@ use App\Common\LoadAssets;
 use App\Common\PluginActivator;
 use App\Common\Router;
 use App\CPT\FeedCPT;
+use App\Cron\PlatformCallCron;
+use App\Cron\SingleFeedCacheRegenerationCron;
 use App\Interfaces\Commons\ApiHandlerInterface;
 use App\Interfaces\Commons\AssetsLoaderInterface;
+use App\PlatformClients\RedditClient;
 use App\SettingsPage\WPBaseSettingsPage;
 use App\ShortCodes\FeedShortCode;
 use App\Validators\RegexValidator;
@@ -30,9 +33,13 @@ class ServiceContainer
         $this->container->add(Router::class);
         $this->container->add(AjaxHandler::class)->addArgument(Router::class);
         
+        $this->container->add(PlatformCallCron::class);
+        $this->container->add(SingleFeedCacheRegenerationCron::class)
+            ->addArgument(RedditClient::class);
         $this->container->add(WpBasePlugin::class)
             ->addArguments([AjaxHandler::class, LoadAssets::class, PluginActivator::class])
-            ->addMethodCall('setShortCodes', [$this->getShortCodes()]);
+            ->addMethodCall('setShortCodes', [$this->getShortCodes()])
+            ->addMethodCall('setCrons', [$this->getCrons()]);
         $this->container->add(FeedCPT::class);
         $this->container->add(UrlValidator::class);
         $this->container->add(RegexValidator::class);
@@ -68,6 +75,13 @@ class ServiceContainer
     public function getShortCodes(){
         return [
             $this->container->get(FeedShortCode::class)
+        ];
+    }
+
+    public function getCrons(){
+        return [
+            $this->container->get(PlatformCallCron::class),
+            $this->container->get(SingleFeedCacheRegenerationCron::class)
         ];
     }
 

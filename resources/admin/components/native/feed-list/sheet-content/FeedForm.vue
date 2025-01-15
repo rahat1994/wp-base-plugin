@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { useForm } from "vee-validate";
 import LoadingSpinner from "../../LoadingSpinner.vue";
 import { Checkbox } from "@/components/ui/checkbox";
-
+import { useToast } from "@/components/ui/toast/use-toast";
 import {
     FormControl,
     FormDescription,
@@ -23,8 +23,6 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { $post } from "@/request";
-
-import { useToast } from "@/components/ui/toast/use-toast";
 const { toast } = useToast();
 
 import { toTypedSchema } from "@vee-validate/zod";
@@ -66,8 +64,8 @@ const secretsFormSchema = toTypedSchema(
             .string({
                 required_error: "Title is required.",
             })
-            .min(2, {
-                message: "Title must be at least 2 characters.",
+            .min(5, {
+                message: "Title must be at least 5 characters.",
             }),
         feed_type: z.string({
             required_error: "Feed type is required.",
@@ -89,7 +87,7 @@ const { handleSubmit, defineField } = useForm({
         title: "",
         feed_type: "new",
         subreddit_url: "",
-        should_be_cached: false,
+        should_be_cached: true,
     },
 });
 
@@ -102,6 +100,10 @@ const [shouldBeCachedField, shouldBeCachedFieldAttrs] =
 
 const onSubmit = handleSubmit((values) => {
     createNewFeed(values);
+    toast({
+        title: "New Feed created",
+        description: "Feed has been created successfully.",
+    });
 });
 
 async function createNewFeed(values) {
@@ -173,14 +175,19 @@ async function createNewFeed(values) {
                                 <SelectItem key="new" value="new"
                                     >New</SelectItem
                                 >
-                                <SelectItem key="popular" value="popular"
-                                    >Popular</SelectItem
+                                <SelectItem key="hot" value="hot"
+                                    >Hot</SelectItem
                                 >
-                                <SelectItem key="gold" value="gold"
-                                    >Gold</SelectItem
+                                <SelectItem key="rising" value="rising"
+                                    >Rising</SelectItem
                                 >
-                                <SelectItem key="default" value="default"
-                                    >Default</SelectItem
+                                <SelectItem key="top" value="top"
+                                    >Top</SelectItem
+                                >
+                                <SelectItem
+                                    key="controversial"
+                                    value="controversial"
+                                    >Controversial</SelectItem
                                 >
                             </SelectGroup>
                         </SelectContent>

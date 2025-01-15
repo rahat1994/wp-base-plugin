@@ -34,6 +34,8 @@ class WpBasePlugin
     public array $CPTS = [];
     public array $shortCodes = [];
     public array $settingsPages = [];
+
+    public array $crons = [];
     public PluginActivator $pluginActivator;
     public function __construct(AjaxHandler $apiHandler, LoadAssets $assetsLoader, PluginActivator $pluginActivator)
     {
@@ -51,6 +53,7 @@ class WpBasePlugin
         $this->registerApiRoutes();
         $this->registerCPT();
         $this->renderMenu();
+        $this->registerCrons();
     }
 
     public function registerCPT(){
@@ -64,8 +67,18 @@ class WpBasePlugin
         }
     }
 
+    public function registerCrons(){
+        foreach($this->crons as $cron){
+            $cron->boot();
+        }
+    }
+
     public function setShortCodes($shortCodes){
         $this->shortCodes = $shortCodes;
+    }
+
+    public function setCrons($crons){
+        $this->crons = $crons;
     }
 
     public function registerSettingsPages() {

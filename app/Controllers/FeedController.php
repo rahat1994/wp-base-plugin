@@ -18,9 +18,10 @@ class FeedController extends BaseController {
 
     public array $acceptedFeedTypes = [
         'new',
-        'popular',
-        'gold',
-        'default'
+        'hot',
+        'top',
+        'rising',
+        'controversial',
     ];
 
     public array $acceptedStatuses = [

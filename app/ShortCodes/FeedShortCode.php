@@ -2,6 +2,7 @@
 
 namespace App\ShortCodes;
 
+use App\Traits\CanInteractWithFeedCPT;
 use App\Validators\RegexValidator;
 use App\PlatformClients\RedditClient;
 use App\Interfaces\ShortCodes\ShortcodeInterface;
@@ -15,6 +16,7 @@ if (!defined('ABSPATH')) {
  */
 class FeedShortCode implements ShortcodeInterface
 {
+    use CanInteractWithFeedCPT;
     public RedditClient $redditClient;
     public array $validators;
 
@@ -50,10 +52,17 @@ class FeedShortCode implements ShortcodeInterface
 
         
         $feedType = $this->getFeedMeta($shortcodeAtts['feed'], '_wprb_feed_type');
+        $shouldBeCached = $this->getFeedMeta($shortcodeAtts['feed'], '_wprb_should_be_cached');
+
         $feedType = $feedType ? $feedType : 'new';
+        $shouldBeCached = $shouldBeCached ? $shouldBeCached : 'true';
         $subRedditName = $this->getSubredditName($rssUrl);
 
-        $subredditData = $this->redditClient->getSubredditHTML($subRedditName, $feedType );
+        $subredditData = $this->redditClient->getSubredditHTML($shortcodeAtts['feed'],$subRedditName, $feedType , $shouldBeCached);
+
+        if(!$subredditData){
+            return '<div class="wp-base-plugin">'.__('Something went wrong.', 'wp-base-plugin').'</div>';
+        }
 
         $feedData = $subredditData['feedData'];
         $subRedditinfo = $subredditData['subRedditInfo'];
@@ -76,37 +85,6 @@ class FeedShortCode implements ShortcodeInterface
     public function getSubredditMetaHTML($subRedditInfo, $feedConfig){
         $title = $subRedditInfo['data']['title'];
         $description = $subRedditInfo['data']['public_description'];
-
-        // Array
-// (
-//     [title] => Array
-//         (
-//             [show] => 1
-//             [tag] => h1
-//             [classes] => 
-//         )
-
-//     [description] => Array
-//         (
-//             [show] => 
-//             [tag] => p
-//             [classes] => 
-//         )
-
-//     [list] => Array
-//         (
-//             [show] => 1
-//             [tag] => ol
-//             [classes] => 
-//         )
-
-//     [links] => Array
-//         (
-//             [tag] => a
-//             [classes] => 
-//         )
-
-// )
 
         $titleHTML = '';
         if (isset($feedConfig['title']['show']) && $feedConfig['title']['show']) {
@@ -156,20 +134,7 @@ class FeedShortCode implements ShortcodeInterface
         return $post;
     }
 
-    public function getFeedMeta(int $id, $meta_key = '_wprb_subreddit_url'){
 
-        $metaValue = get_post_meta($id, $meta_key, true);
-
-        // if the meta value is empty return an empty string
-        $regexValidator = new RegexValidator();
-        $isRedditUrl = $regexValidator->validate($metaValue);
-
-        if ($isRedditUrl) {
-            return $metaValue;
-        }
-
-        return false;
-    }
 
     public function getRssUrlContent($url){
         error_log($url);
@@ -180,16 +145,6 @@ class FeedShortCode implements ShortcodeInterface
 
         error_log('The xml string: '.$xmlString);
         return $xmlString;
-    }
-
-    public function getSubredditName($url){
-        // ex: https://www.reddit.com/r/ecommerce/
-
-        $urlParts = explode('/', $url);
-        $subRedditName = $urlParts[count($urlParts) - 2];
-
-        return $subRedditName;
-        
     }
 
     public function getFeedConfig($feedId){

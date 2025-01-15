@@ -12,27 +12,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { toTypedSchema } from "@vee-validate/zod";
-import { reactive, onMounted } from "vue";
+import { reactive, onMounted, ref } from "vue";
 import * as z from "zod";
 import { $get, $post } from "@/request";
 import { useForm } from "vee-validate";
 import LoadingSpinner from "@/components/native/LoadingSpinner.vue";
 const secretsFormSchema = toTypedSchema(
     z.object({
-        clientId: z
-            .string({
-                required_error: "Client ID is required.",
-            })
-            .min(2, {
-                message: "Client ID must be at least 2 characters.",
-            }),
-        clientSecret: z
-            .string({
-                required_error: "Client Secret is required.",
-            })
-            .min(2, {
-                message: "Client Secret must be at least 2 characters.",
-            }),
+        clientId: z.string({
+            required_error: "Client ID is required.",
+        }),
+        clientSecret: z.string({
+            required_error: "Client Secret is required.",
+        }),
     })
 );
 
@@ -53,6 +45,8 @@ const state = reactive({
     isLoading: false,
     error: null,
 });
+
+const showPassword = ref(false);
 
 const [clientIdField, clientIdFieldAttrs] = defineField("clientId");
 const [clientSecretField, clientSecretFieldAttrs] = defineField("clientSecret");
@@ -139,6 +133,10 @@ const hydrateForm = (data) => {
 onMounted(async () => {
     getSettings();
 });
+
+const toggleShowPassword = () => {
+    showPassword.value = !showPassword.value;
+};
 </script>
 
 <template>
@@ -177,13 +175,23 @@ onMounted(async () => {
                 <FormItem>
                     <FormLabel>Client Secret</FormLabel>
                     <FormControl>
-                        <Input
-                            type="text"
-                            placeholder="Your client secret"
-                            @disabled="state.isLoading"
-                            v-bind="clientSecretFieldAttrs"
-                            v-model="clientSecretField"
-                        />
+                        <div class="relative">
+                            <Input
+                                :type="showPassword ? 'text' : 'password'"
+                                placeholder="Your client secret"
+                                @disabled="state.isLoading"
+                                v-bind="clientSecretFieldAttrs"
+                                v-model="clientSecretField"
+                            />
+                            <button
+                                type="button"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                                @click="toggleShowPassword"
+                            >
+                                <span v-if="showPassword">Hide</span>
+                                <span v-else>Show</span>
+                            </button>
+                        </div>
                     </FormControl>
                     <FormDescription>
                         This is the client secret for your application.
