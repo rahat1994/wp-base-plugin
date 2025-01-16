@@ -67,14 +67,14 @@ class FeedController extends BaseController {
         if (!isset($_GET['id'])) {
             wp_send_json_error([
                 'success' => false,
-                'feed'    => 'Feed ID is required!',
+                'feed'    => __('Feed ID is required!', 'wp-base-plugin'),
             ]);
         }
 
-        $_GET['id'] = sanitize_text_field($_GET['id']);
+        $feedId = sanitize_text_field($_GET['id']);
 
         try {
-            $feed = $this->getByID($_GET['id']);
+            $feed = $this->getByID($feedId);
 
             wp_send_json_success([
                 'success' => true,
@@ -92,21 +92,21 @@ class FeedController extends BaseController {
         if (empty($_POST['title']) || empty($_POST['subreddit_url']) || empty($_POST['feed_type']) || empty($_POST['should_be_cached'])) {
             wp_send_json_error([
                 'success' => false,
-                'feed'    => 'All fields are required!',
+                'feed'    => __('All fields are required!', 'wp-base-plugin'),
             ]);
         }
 
         if(in_array($_POST['feed_type'], $this->acceptedFeedTypes, true) === false){
             wp_send_json_error([
                 'success' => false,
-                'feed'    => 'Feed type is not accepted!',
+                'feed'    => __('Feed type is not accepted!', 'wp-base-plugin'),
             ]);
         }
 
         if($_POST['should_be_cached'] !== 'true' && $_POST['should_be_cached'] !== 'false'){
             wp_send_json_error([
                 'success' => false,
-                'feed'    => 'Should be cached field is not accepted!',
+                'feed'    => __('Should be cached field is not accepted!', 'wp-base-plugin'),
             ]);
 
         }
@@ -117,21 +117,21 @@ class FeedController extends BaseController {
         if (empty($_POST['id']) || empty($_POST['title']) || empty($_POST['subreddit_url']) || empty($_POST['feed_type']) || empty($_POST['should_be_cached'])) {
             wp_send_json_error([
                 'success' => false,
-                'feed'    => 'All fields are required!',
+                'feed'    => __('All fields are required!', 'wp-base-plugin'),
             ]);
         }
 
         if(in_array($_POST['feed_type'], $this->acceptedFeedTypes, true) === false){
             wp_send_json_error([
                 'success' => false,
-                'feed'    => 'Feed type is not accepted!',
+                'feed'    => __('Feed type is not accepted!', 'wp-base-plugin'),
             ]);
         }
 
         if($_POST['should_be_cached'] !== 'true' && $_POST['should_be_cached'] !== 'false'){
             wp_send_json_error([
                 'success' => false,
-                'feed'    => 'Should be cached field is not accepted!',
+                'feed'    => __('Should be cached field is not accepted!', 'wp-base-plugin'),
             ]);
 
         }
@@ -140,40 +140,40 @@ class FeedController extends BaseController {
 
     public function store(){
 
-        $_POST['title'] = sanitize_text_field($_POST['title']);
-        $_POST['feed_type'] = sanitize_text_field($_POST['feed_type']);
-        $_POST['subreddit_url'] = sanitize_url($_POST['subreddit_url']);
-        $_POST['should_be_cached'] = sanitize_text_field($_POST['should_be_cached']);
-
         $this->validateCreateFormInput();
+
+        $title = sanitize_text_field(wp_unslash($_POST['title']));
+        $feedType = sanitize_text_field(wp_unslash($_POST['feed_type']));
+        $subredditURL = sanitize_url(wp_unslash($_POST['subreddit_url']));
+        $shouldBeCached = true;
 
         // TODO: Further validation.
 
         try {
 
             $data = [
-                'post_title' => $_POST['title'],
+                'post_title' => $title,
                 'post_status' => 'publish',
                 'post_type' => 'subreddit_feed',
                 'meta'=> [
-                    '_wprb_subreddit_url' => $_POST['subreddit_url'],
-                    '_wprb_feed_type' => $_POST['feed_type'],
-                    '_wprb_should_be_cached' => $_POST['should_be_cached'],
+                    '_wprb_subreddit_url' => $subredditURL,
+                    '_wprb_feed_type' => $feedType,
+                    '_wprb_should_be_cached' => $shouldBeCached,
                 ]
             ];
 
-            $feed = $this->create($data);
+            $feed = $this->createFeed($data);
 
             if(!$feed){
                 wp_send_json_error([
                     'success' => false,
-                    'feed'    => 'Feed could not be created!',
+                    'feed'    => __('Feed could not be created!', 'wp-base-plugin'),
                 ]);
             }
 
             wp_send_json_success([
                 'success' => true,
-                'feed'    => 'Feed created successfully!',
+                'feed'    => __('Feed edited successfully!', 'wp-base-plugin'),
             ]);
         } catch (\Exception $e) {
             wp_send_json_error([
@@ -184,24 +184,29 @@ class FeedController extends BaseController {
     }
 
     public function update(){
-         $this->validateEditFormInput();
+        $this->validateEditFormInput();
+        $id = sanitize_text_field($_POST['id']);
+        $title = sanitize_text_field($_POST['title']);
+        $feedType = sanitize_text_field($_POST['feed_type']);
+        $subredditURL = sanitize_url($_POST['subreddit_url']);
+        $shouldBeCached = true;
 
         try {
 
             $data = [
-                'post_title' => $_POST['title'],
+                'post_title' => $title,
                 'meta'=> [
-                    '_wprb_subreddit_url' => $_POST['subreddit_url'],
-                    '_wprb_feed_type' => $_POST['feed_type'],
-                    '_wprb_should_be_cached' => $_POST['should_be_cached'],
+                    '_wprb_subreddit_url' => $subredditURL,
+                    '_wprb_feed_type' => $feedType,
+                    '_wprb_should_be_cached' => $shouldBeCached,
                 ]
             ];
 
-            $feed = $this->updateFeed($_POST['id'], $data);
+            $feed = $this->updateFeed($id, $data);
 
             wp_send_json_error([
                 'success' => true,
-                'feed'    => 'Feed updated successfully!',
+                'feed'    => __('Feed updated successfully!', 'wp-base-plugin'),
             ]);
         } catch (\Exception $e) {
             wp_send_json_error([
@@ -215,18 +220,18 @@ class FeedController extends BaseController {
         if (empty($_POST['id'])) {
             wp_send_json_success([
                 'success' => false,
-                'feed'    => 'POST ID is required!',
+                'feed'    => __('POST ID is required!', 'wp-base-plugin'),
             ]);
         }
 
-        $_POST['id'] = sanitize_text_field($_POST['id']);
+        $id = sanitize_text_field($_POST['id']);
 
         try {
-            $this->deleteFeedPost($_POST['id']);
+            $this->deleteFeedPost($id);
 
             wp_send_json_success([
                 'success' => true,
-                'feed'    => 'Feed deleted successfully!',
+                'feed'    => __('Feed deleted successfully!', 'wp-base-plugin'),
             ]);
         } catch (\Exception $e) {
             wp_send_json_error([
@@ -241,7 +246,7 @@ class FeedController extends BaseController {
         if (empty($_POST['id']) || empty($_POST['status'])) {
             wp_send_json_error([
                 'success' => false,
-                'feed'    => 'post id and status are required!',
+                'feed'    => __('post id and status are required!', 'wp-base-plugin'),
             ]);
         }
 
@@ -251,7 +256,7 @@ class FeedController extends BaseController {
         if(in_array($status, $this->acceptedStatuses, true) === false){
             wp_send_json_error([
                 'success' => false,
-                'feed'    => 'Status is not accepted!',
+                'feed'    => __('Status is not accepted!', 'wp-base-plugin'),
             ]);
         }
 
@@ -260,7 +265,7 @@ class FeedController extends BaseController {
 
             wp_send_json_success([
                 'success' => true,
-                'feed'    => 'Feed status changed successfully!',
+                'feed'    => __('Feed status changed successfully!', 'wp-base-plugin'),
             ]);
         } catch (\Exception $e) {
             wp_send_json_error([
@@ -274,7 +279,7 @@ class FeedController extends BaseController {
         if (empty($_POST['id'])) {
             wp_send_json_success([
                 'success' => false,
-                'feed'    => 'post id is required!',
+                'feed'    => __('post id is required!', 'wp-base-plugin'),
             ]);
         }
 
@@ -285,7 +290,7 @@ class FeedController extends BaseController {
             sleep(3);
             wp_send_json_success([
                 'success' => true,
-                'feed'    => 'Cache regenerated successfully!',
+                'feed'    => __('Cache regenerated successfully!', 'wp-base-plugin'),
             ]);
         } catch (\Exception $e) {
             wp_send_json_error([

@@ -34,7 +34,7 @@ trait CanInteractWithFeedCPT
         return $post;
     }
 
-    public function create($data){
+    public function createFeed($data){
         return FeedRepository::createPost($data);
         
     }
