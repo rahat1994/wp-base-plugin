@@ -245,10 +245,10 @@ class FeedController extends BaseController {
             ]);
         }
 
-        $_POST['id'] = sanitize_text_field($_POST['id']);
-        $_POST['status'] = sanitize_text_field($_POST['status']);
+        $id = sanitize_text_field($_POST['id']);
+        $status = sanitize_text_field($_POST['status']);
 
-        if(in_array($_POST['status'], $this->acceptedStatuses, true) === false){
+        if(in_array($status, $this->acceptedStatuses, true) === false){
             wp_send_json_error([
                 'success' => false,
                 'feed'    => 'Status is not accepted!',
@@ -256,7 +256,7 @@ class FeedController extends BaseController {
         }
 
         try {
-            $this->changeFeedStatus($_POST['id'], $_POST['status']);
+            $this->changeFeedStatus($id, $status);
 
             wp_send_json_success([
                 'success' => true,
@@ -278,11 +278,11 @@ class FeedController extends BaseController {
             ]);
         }
 
-        $_POST['id'] = sanitize_text_field($_POST['id']);
+        $id = sanitize_text_field($_POST['id']);
 
         try {
-            $this->regenerateFeedCache($_POST['id']);
-
+            // $this->regenerateFeedCache($id);
+            sleep(3);
             wp_send_json_success([
                 'success' => true,
                 'feed'    => 'Cache regenerated successfully!',

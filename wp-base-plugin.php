@@ -1,6 +1,8 @@
 <?php
 
 use App\Common\PluginActivator;
+use App\Interfaces\CPT\CPTInterface;
+use App\Interfaces\ShortCodes\ShortcodeInterface;
 
 /**
  * Plugin Name: Wp Base Plugin
@@ -22,9 +24,6 @@ require_once(PLUGIN_CONST_DIR . 'vendor/autoload.php');
 
 use App\Common\AjaxHandler;
 use App\Common\LoadAssets;
-use App\Interfaces\Commons\ApiHandlerInterface;
-use App\Interfaces\Commons\AssetsLoaderInterface;
-use DI\Container;
 
 class WpBasePlugin
 {
@@ -58,12 +57,16 @@ class WpBasePlugin
 
     public function registerCPT(){
         foreach($this->CPTS as $cpt){
-            $cpt->boot();
+            if($cpt instanceof CPTInterface){
+                $cpt->boot();
+            }
         }
     }
     public function registerShortCodes() {
         foreach($this->shortCodes as $shortCode){
-            $shortCode->boot();
+            if ($shortCode instanceof ShortcodeInterface) {
+                $shortCode->boot();
+            }
         }
     }
 

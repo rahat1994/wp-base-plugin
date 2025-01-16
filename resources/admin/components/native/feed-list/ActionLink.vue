@@ -34,6 +34,7 @@ import ViewSheetContent from "./sheet-content/ViewSheetContent.vue";
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { onMounted, ref } from "vue";
+import swal from "sweetalert";
 const openSheet = ref(false);
 
 const props = defineProps({
@@ -88,6 +89,8 @@ function handleFormSubmissionSuccess(data) {
     if (reloadButton) {
         reloadButton.click();
     }
+    swal("Success", "Feed has been updated successfully", "success");
+
     emit("formSubmissionSuccess", data);
 }
 

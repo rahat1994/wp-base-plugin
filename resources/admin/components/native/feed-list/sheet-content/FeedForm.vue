@@ -100,10 +100,6 @@ const [shouldBeCachedField, shouldBeCachedFieldAttrs] =
 
 const onSubmit = handleSubmit((values) => {
     createNewFeed(values);
-    toast({
-        title: "New Feed created",
-        description: "Feed has been created successfully.",
-    });
 });
 
 async function createNewFeed(values) {
@@ -208,7 +204,7 @@ async function createNewFeed(values) {
                         />
                     </FormControl>
                     <FormDescription>
-                        This is the subreddit URL for your post.
+                        Subreddit URL. i.e. https://www.reddit.com/r/ecommerce
                     </FormDescription>
                     <FormMessage />
                 </FormItem>

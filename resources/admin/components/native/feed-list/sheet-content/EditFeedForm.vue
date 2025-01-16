@@ -1,8 +1,7 @@
 <script setup>
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Progress } from "@/components/ui/progress";
-import { Form, useForm } from "vee-validate";
+import { useForm } from "vee-validate";
 import LoadingSpinner from "../../LoadingSpinner.vue";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -23,12 +22,8 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { $post } from "@/request";
-
-import { useToast } from "@/components/ui/toast/use-toast";
-const { toast } = useToast();
-
 import { toTypedSchema } from "@vee-validate/zod";
-import { h, onMounted, ref, watchEffect, reactive } from "vue";
+import { reactive } from "vue";
 import * as z from "zod";
 
 const props = defineProps({
@@ -83,7 +78,7 @@ const feedEditFormSchema = toTypedSchema(
     })
 );
 
-const { handleSubmit, defineField } = useForm({
+const { handleSubmit, defineField, meta } = useForm({
     validationSchema: feedEditFormSchema,
     initialValues: props.feedData,
 });
@@ -102,8 +97,6 @@ async function editFeed(values) {
     return new Promise(async (resolve) => {
         try {
             state.isLoading = true;
-
-            await new Promise((resolve) => setTimeout(resolve, 500));
 
             state.error = null;
             const args = {
@@ -168,14 +161,19 @@ async function editFeed(values) {
                                 <SelectItem key="new" value="new"
                                     >New</SelectItem
                                 >
-                                <SelectItem key="popular" value="popular"
-                                    >Popular</SelectItem
+                                <SelectItem key="hot" value="hot"
+                                    >Hot</SelectItem
                                 >
-                                <SelectItem key="gold" value="gold"
-                                    >Gold</SelectItem
+                                <SelectItem key="rising" value="rising"
+                                    >Rising</SelectItem
                                 >
-                                <SelectItem key="default" value="default"
-                                    >Default</SelectItem
+                                <SelectItem key="top" value="top"
+                                    >Top</SelectItem
+                                >
+                                <SelectItem
+                                    key="controversial"
+                                    value="controversial"
+                                    >Controversial</SelectItem
                                 >
                             </SelectGroup>
                         </SelectContent>
@@ -230,7 +228,10 @@ async function editFeed(values) {
             </FormField>
             <br />
             <div class="flex justify-start pt-2">
-                <Button type="submit" :disabled="state.isLoading">
+                <Button
+                    type="submit"
+                    :disabled="state.isLoading || !meta.dirty"
+                >
                     <LoadingSpinner v-if="state.isLoading" /> Save
                 </Button>
             </div>

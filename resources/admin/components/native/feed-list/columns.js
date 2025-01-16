@@ -110,13 +110,11 @@ export const columns = [
         enableHiding: false,
         header: () => h("div", { class: "text-left" }, "Actions"),
         cell: ({ row }) => {
-            const payment = row.original;
-
             return h(
                 "div",
                 { class: "relative" },
                 h(DropdownAction, {
-                    payment,
+                    feed: row.original,
                 })
             );
         },

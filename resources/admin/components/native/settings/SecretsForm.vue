@@ -38,8 +38,15 @@ const formDefination = () => {
     };
 };
 
-const { values, resetForm, handleSubmit, isSubmitting, errors, defineField } =
-    useForm(formDefination());
+const {
+    values,
+    resetForm,
+    handleSubmit,
+    isSubmitting,
+    meta,
+    errors,
+    defineField,
+} = useForm(formDefination());
 
 const state = reactive({
     isLoading: false,
@@ -203,7 +210,7 @@ const toggleShowPassword = () => {
             <div class="flex justify-start">
                 <Button
                     type="submit"
-                    @disabled="isSubmitting || state.isLoading"
+                    :disabled="!meta.dirty || state.isLoading"
                 >
                     <LoadingSpinner v-if="isSubmitting || state.isLoading" />
                     Update secrets
