@@ -203,7 +203,7 @@ async function editFeed(values) {
             <FormField name="should_be_cached" v-slot="{ value, handleChange }">
                 <FormItem>
                     <FormControl>
-                        <div class="flex items-center space-x-2 mt-4">
+                        <div class="flex items-center space-x-2 mt-4 hidden">
                             <Checkbox
                                 id="should_be_cached"
                                 :checked="value"
