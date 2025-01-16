@@ -43,7 +43,7 @@ class Vite
     {
         if (in_array($handle, (static::$instance)->moduleScripts)) {
             if (static::isDevMode()) {
-                throw new Exception('This handel Has been used');
+                throw new Exception(__('This handle has been used', 'wp-base-plugin'));
             }
             return;
         }
@@ -76,7 +76,7 @@ class Vite
 
         $manifestPath = PLUGIN_CONST_DIR . '/assets/.vite/manifest.json';
         if (!file_exists($manifestPath)) {
-            throw new Exception('Vite Manifest Not Found. Run : npm run dev or npm run prod');
+            throw new Exception(__('Vite Manifest Not Found. Run : npm run dev or npm run prod', 'wp-base-plugin'));
         }
         global $wp_filesystem;
         if (empty($wp_filesystem)) {
@@ -86,7 +86,7 @@ class Vite
 
         $manifestData = $wp_filesystem->get_contents($manifestPath);
         if ($manifestData === false) {
-            throw new Exception('Failed to read Vite Manifest file.');
+            throw new Exception(__('Failed to read Vite Manifest file.', 'wp-base-plugin'));
         }
         (static::$instance)->manifestData = json_decode($manifestData, true);
     }
