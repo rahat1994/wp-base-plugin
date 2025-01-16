@@ -3,6 +3,7 @@
 use App\Common\AjaxHandler;
 use App\Common\LoadAssets;
 use App\Common\PluginActivator;
+use App\Common\PluginDeactivator;
 use App\Common\Router;
 use App\CPT\FeedCPT;
 use App\Cron\PlatformCallCron;
@@ -36,8 +37,9 @@ class ServiceContainer
         $this->container->add(PlatformCallCron::class);
         $this->container->add(SingleFeedCacheRegenerationCron::class)
             ->addArgument(RedditClient::class);
+        $this->container->add(PluginDeactivator::class);
         $this->container->add(WpBasePlugin::class)
-            ->addArguments([AjaxHandler::class, LoadAssets::class, PluginActivator::class])
+            ->addArguments([AjaxHandler::class, LoadAssets::class, PluginActivator::class, PluginDeactivator::class])
             ->addMethodCall('setShortCodes', [$this->getShortCodes()])
             ->addMethodCall('setCrons', [$this->getCrons()]);
         $this->container->add(FeedCPT::class);

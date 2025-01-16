@@ -1,6 +1,7 @@
 <?php
 
 use App\Common\PluginActivator;
+use App\Common\PluginDeactivator;
 use App\Interfaces\CPT\CPTInterface;
 use App\Interfaces\ShortCodes\ShortcodeInterface;
 
@@ -30,17 +31,22 @@ class WpBasePlugin
 
     public AjaxHandler $apiHandler;
     public LoadAssets $assetsLoader;
+
+    public PluginActivator $pluginActivator;
+
+    public PluginDeactivator $pluginDeactivator;
     public array $CPTS = [];
     public array $shortCodes = [];
     public array $settingsPages = [];
 
     public array $crons = [];
-    public PluginActivator $pluginActivator;
-    public function __construct(AjaxHandler $apiHandler, LoadAssets $assetsLoader, PluginActivator $pluginActivator)
+    
+    public function __construct(AjaxHandler $apiHandler, LoadAssets $assetsLoader, PluginActivator $pluginActivator, PluginDeactivator $pluginDeactivator)
     {
         $this->apiHandler = $apiHandler;
         $this->assetsLoader = $assetsLoader;
         $this->pluginActivator = $pluginActivator;
+        $this->pluginDeactivator = $pluginDeactivator;
     }
 
     public function boot()
@@ -53,6 +59,7 @@ class WpBasePlugin
         $this->registerCPT();
         $this->renderMenu();
         $this->registerCrons();
+        $this->deactivatePlugin();
     }
 
     public function registerCPT(){
@@ -99,6 +106,12 @@ class WpBasePlugin
     {
         register_activation_hook(__FILE__, function ($netWorkWide) {
             $this->pluginActivator->migrateDatabases($netWorkWide);
+        });
+    }
+
+    public function deactivatePlugin(){
+        register_deactivation_hook(__FILE__, function($networkWide){
+            $this->pluginDeactivator->deactivate();
         });
     }
 
