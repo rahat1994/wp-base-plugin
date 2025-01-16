@@ -4,11 +4,13 @@ namespace App\Cron;
 
 use App\PlatformClients\RedditClient;
 use App\Repositories\PlatformCallCacheRepository;
+use App\Traits\CanInteractWithFeedCacheOption;
 use App\Traits\CanInteractWithFeedCPT;
 
 class SingleFeedCacheRegenerationCron
 {
     use CanInteractWithFeedCPT;
+    use CanInteractWithFeedCacheOption;
     public RedditClient $redditClient;
     public function __construct(RedditClient $redditClient){
         $this->redditClient = $redditClient;
@@ -46,7 +48,7 @@ class SingleFeedCacheRegenerationCron
         }
         
         $feedType = $this->getFeedMeta($feedId, '_wprb_feed_type');
-        $shouldBeCached = $this->getFeedMeta($feedId, '_wprb_should_be_cached');
+        $shouldBeCached = true;
 
         $feedType = $feedType ? $feedType : 'new';
         $shouldBeCached = $shouldBeCached ? $shouldBeCached : 'true';
@@ -54,19 +56,11 @@ class SingleFeedCacheRegenerationCron
 
         $subredditData = $this->redditClient->getSubredditHTML($feedId,$subRedditName, $feedType , $shouldBeCached);
         error_log("From Single Cron: ");
-        error_log(json_encode($subredditData));
+        error_log(wp_json_encode($subredditData));
         error_log("From Single Cron end: ");
         if($subredditData){
             $this->setCacheRegenerationFeedIds($feedIds);
         }
 
-    }
-
-    public function getCacheRegenerationFeedIds(){
-        return get_option('wp_base_plugin_cache_regeneration_feed_ids');
-    }
-
-    public function setCacheRegenerationFeedIds($feedIds){
-        update_option('wp_base_plugin_cache_regeneration_feed_ids', $feedIds);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Cron;
 
 use App\Repositories\PlatformCallCacheRepository;
+use App\Traits\CanInteractWithFeedCacheOption;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -21,6 +22,7 @@ if (!defined('ABSPATH')) {
 
 class PlatformCallCron
 {
+    use CanInteractWithFeedCacheOption;
     public function boot()
     {
         add_action('wp_base_plugin_platform_call_cron', [$this, 'platformCallCron']);
@@ -31,17 +33,18 @@ class PlatformCallCron
 
     public function platformCallCron()
     {
-        $feedIds = PlatformCallCacheRepository::getCachesThatAreExpired();
-        $feedIdsAlreadyInQueue = $this->getCacheRegenerationFeedIds();
-        $feedIds = array_unique(array_merge($feedIds, $feedIdsAlreadyInQueue));
-        $this->setCacheRegenerationFeedIds($feedIds);
+        try {
+            $feedIds = PlatformCallCacheRepository::getCachesThatAreExpired();
+            $feedIdsAlreadyInQueue = $this->getCacheRegenerationFeedIds();
+            $feedIds = array_unique(array_merge($feedIds, $feedIdsAlreadyInQueue));
+            $this->setCacheRegenerationFeedIds($feedIds);
+        } catch (\Exception $e) {
+            //throw $th;
+            error_log($e);
+            $this->setCacheRegenerationCronErrorOption($e->getMessage());
+        }
+        
     }
 
-    public function getCacheRegenerationFeedIds(){
-        return get_option('wp_base_plugin_cache_regeneration_feed_ids');
-    }
 
-    public function setCacheRegenerationFeedIds($feedIds){
-        update_option('wp_base_plugin_cache_regeneration_feed_ids', $feedIds);
-    }
 }
