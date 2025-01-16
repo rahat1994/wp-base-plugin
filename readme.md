@@ -5,8 +5,8 @@ WP Base Plugin is a WordPress plugin that relies on Vite, Vue, and Composer. Thi
 ## Requirements
 
 -   WordPress 6.0 or higher
--   PHP 8.2 or higher
--   Node.js 14 or higher
+-   PHP 7.4 or higher
+-   Node.js 18 or higher
 -   Composer
 
 ## Installation
