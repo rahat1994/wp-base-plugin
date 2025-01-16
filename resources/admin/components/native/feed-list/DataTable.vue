@@ -19,14 +19,23 @@ import {
     getCoreRowModel,
     useVueTable,
 } from "@tanstack/vue-table";
+import LoadingSpinner from "../LoadingSpinner.vue";
 
 const props = defineProps({
     columns: Array,
     data: Array,
     users: Array,
     totalNumberOfFeedItems: Number,
+    isLoading: {
+        type: Boolean,
+        required: false,
+    },
+    filterTitle: {
+        type: String,
+        required: false,
+    },
 });
-const title = ref("");
+const title = ref(props.filterTitle);
 const table = useVueTable({
     get data() {
         return props.data;
@@ -37,20 +46,17 @@ const table = useVueTable({
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
 });
+
 const emit = defineEmits(["reloadFeeds", "filterUsingTitle"]);
 const reloadFeeds = () => {
-    console.log("Reloading feeds...");
     emit("reloadFeeds");
 };
 
 function handleFormSubmissionSuccess(data) {
-    console.log("DataTable handleFormSubmissionSuccess");
     emit("reloadFeeds");
 }
 
 function filterByTitle() {
-    console.log("Filtering by title...");
-    console.log(title.value);
     emit("filterUsingTitle", title.value);
 }
 </script>
@@ -60,7 +66,10 @@ function filterByTitle() {
         <div class="flex gap-2 items-center py-4">
             <div class="flex w-full items-center gap-1.5">
                 <Input placeholder="Filter title..." v-model="title" />
-                <Button @click="filterByTitle" size="lg"> Search </Button>
+                <Button @click="filterByTitle" size="lg">
+                    <LoadingSpinner v-if="props.isLoading" />
+                    Search
+                </Button>
             </div>
             <CreateNewFeed :users="props.users" @reloadFeeds="reloadFeeds" />
             <Button

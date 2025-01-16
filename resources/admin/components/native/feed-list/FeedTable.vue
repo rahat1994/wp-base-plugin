@@ -104,6 +104,7 @@ function relaodFeeds() {
 
 function filterUsingTitle(filterTitle) {
     state.filterTitle = filterTitle;
+    state.currentPage = 1;
     getFeeds(filterTitle);
 }
 </script>
@@ -117,6 +118,8 @@ function filterUsingTitle(filterTitle) {
             :data="state.data"
             :totalNumberOfFeedItems="state.total"
             :users="state.users"
+            :isLoading="state.isLoading"
+            :filterTitle="state.filterTitle"
         />
         <div class="flex items-center justify-end py-4 space-x-2">
             <Pagination
