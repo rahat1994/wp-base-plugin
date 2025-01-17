@@ -33,7 +33,6 @@ class ServiceContainer
         $this->container->add(LoadAssets::class);
         $this->container->add(Router::class);
         $this->container->add(AjaxHandler::class)->addArgument(Router::class);
-        
         $this->container->add(PlatformCallCron::class);
         $this->container->add(SingleFeedCacheRegenerationCron::class)
             ->addArgument(RedditClient::class);

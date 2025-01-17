@@ -4,12 +4,12 @@ namespace App\Common;
 
 use Exception;
 
-class Vite
+class FrontEndVite
 {
     private static $instance = null;
     private string $viteHostProtocol = 'http://';
     private string $viteHost = 'localhost';
-    private string $vitePort = '8880';
+    private string $vitePort = '9990';
     private string $resourceDirectory = 'resources/';
     private array $moduleScripts = [];
     private bool $isScriptFilterAdded = false;
@@ -65,7 +65,7 @@ class Vite
             return;
         }
 
-        $manifestPath = PLUGIN_CONST_DIR . '/assets/.vite/manifest.json';
+        $manifestPath = PLUGIN_CONST_DIR . '/assets/frontend/.vite/manifest.json';
         if (!file_exists($manifestPath)) {
             throw new Exception(__('Vite Manifest Not Found. Run : npm run dev or npm run prod', 'wp-base-plugin'));
         }

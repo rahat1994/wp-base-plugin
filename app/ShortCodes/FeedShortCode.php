@@ -2,8 +2,8 @@
 
 namespace App\ShortCodes;
 
+use App\Common\LoadAssets;
 use App\Traits\CanInteractWithFeedCPT;
-use App\Validators\RegexValidator;
 use App\PlatformClients\RedditClient;
 use App\Interfaces\ShortCodes\ShortcodeInterface;
 if (!defined('ABSPATH')) {
@@ -18,16 +18,33 @@ class FeedShortCode implements ShortcodeInterface
 {
     use CanInteractWithFeedCPT;
     public RedditClient $redditClient;
+    public LoadAssets $assetsLoader;
     public array $validators;
 
-    public function __construct(RedditClient $redditClient){
+    public function __construct(RedditClient $redditClient, LoadAssets $assetsLoadiner){
         $this->redditClient = $redditClient;
+        $this->assetsLoader = $assetsLoadiner;
     }
 
     public function boot(){
-        add_shortcode('wprb-subreddit-feed', array($this,'render_subreddit_feed'));
+        add_action('wp_enqueue_scripts', [$this, 'loadFrontendScripts']);
+        add_shortcode('wprb-subreddit-feed', array($this,'renderFeedWithJS'));
     }
 
+    public function loadFrontendScripts(){
+        $this->assetsLoader->frontend();
+    }
+
+    public function renderFeedWithJS(){
+        return '<div x-data="loveCounter" >
+                    <h1>Show some heart</h1>
+                    <div x-text="hearts()" >
+                    </div>
+                    <div>
+                        <button @click="love" >Show 💟</button>
+                    </div>
+                </div>';
+    }
     public function render_subreddit_feed($atts = [], $content = null, $tag = ''){
         
         // normalize attribute keys, lowercase

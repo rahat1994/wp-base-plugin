@@ -19,6 +19,7 @@ class AjaxHandler implements ApiHandlerInterface
     public function boot($apiNamespace = 'wp_base_plugin')
     {
         add_action('wp_ajax_' . $apiNamespace, [$this, 'handleRequest']);
+        
     }
 
     public function handleRequest()
