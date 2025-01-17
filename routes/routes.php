@@ -17,3 +17,7 @@ $router->post('editor-save-feed-config', "EditorController@saveFeedConfig");
 $router->get('editor-get-feed-config', "EditorController@getFeedConfig");
 
 
+// frontend
+$router->get('get-feed-posts', "FeedPostController@index");
+
+

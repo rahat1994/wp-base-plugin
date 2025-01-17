@@ -2,6 +2,7 @@
 
 namespace App\ShortCodes;
 
+use App\Common\FrontendAjaxHandler;
 use App\Common\LoadAssets;
 use App\Traits\CanInteractWithFeedCPT;
 use App\PlatformClients\RedditClient;
@@ -19,43 +20,66 @@ class FeedShortCode implements ShortcodeInterface
     use CanInteractWithFeedCPT;
     public RedditClient $redditClient;
     public LoadAssets $assetsLoader;
+    public FrontendAjaxHandler $frontendAjaxHandler;
     public array $validators;
 
-    public function __construct(RedditClient $redditClient, LoadAssets $assetsLoadiner){
+    public function __construct(RedditClient $redditClient, LoadAssets $assetsLoadiner, FrontendAjaxHandler $ajaxHandler){
         $this->redditClient = $redditClient;
         $this->assetsLoader = $assetsLoadiner;
+        $this->frontendAjaxHandler = $ajaxHandler;
     }
 
     public function boot(){
+        $this->frontendAjaxHandler->boot();
         add_action('wp_enqueue_scripts', [$this, 'loadFrontendScripts']);
         add_shortcode('wprb-subreddit-feed', array($this,'renderFeedWithJS'));
     }
 
     public function loadFrontendScripts(){
         $this->assetsLoader->frontend();
+        $this->localizeScript();
     }
 
-    public function renderFeedWithJS(){
-        return '<div x-data="loveCounter" >
-                    <h1>Show some heart</h1>
-                    <div x-text="hearts()" >
-                    </div>
-                    <div>
-                        <button @click="love" >Show 💟</button>
-                    </div>
-                </div>';
+    public function localizeScript(){
+        $translatable = apply_filters('wp-base-plugin/frontend_translatable_strings', array(
+            'hello' => __('Hello', 'wp-base-plugin'),
+        ));
+
+        $pluginlowercase = apply_filters('wp-base-plugin/fronendVars', array(
+            'url' => PLUGIN_CONST_URL,
+            'assets_url' => PLUGIN_CONST_URL . 'assets/',
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'action'        => 'wp_base_plugin_frontend',
+            'nonce'         => wp_create_nonce('wp-base-plugin-nonce-frontend'),
+            'i18n' => $translatable
+        ));
+
+        wp_localize_script('wp-base-plugin-frontend-script', 'wpBasePluginFrontend', $pluginlowercase);
     }
-    public function render_subreddit_feed($atts = [], $content = null, $tag = ''){
-        
+
+    public function getShortcodeAttributes($atts, $tag){
         // normalize attribute keys, lowercase
         $atts = array_change_key_case( (array) $atts, CASE_LOWER );
         
         // override default attributes with user attributes
-        $shortcodeAtts = shortcode_atts(
+        return shortcode_atts(
             array(
                 'feed' => null,
             ), $atts, $tag
         );
+    }
+    public function renderFeedWithJS($atts = [], $content = null, $tag = ''){
+        $shortcodeAtts = $this->getShortcodeAttributes($atts, $tag);
+
+        return '<div x-init="{feedId: 46}"><div x-data="feed" x-init="feedId = '.$shortcodeAtts['feed'].'">
+            <span x-html="renderFeed"></span>
+        </div></div>';
+    }
+    public function render_subreddit_feed($atts = [], $content = null, $tag = ''){
+        
+        
+    
+        $shortcodeAtts = $this->getShortcodeAttributes($atts, $tag);
 
         if ($shortcodeAtts['feed'] == null) {
             return '<div class="wp-base-notice">'.__('Missing feed attribute', 'wp-base-plugin').'</div>';

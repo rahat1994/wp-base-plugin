@@ -7,8 +7,8 @@
         "dev": "vite",
         "build": "vite build",
         "preview": "vite preview",
-        "frontenddev": "vite --mode frontend",
-        "frontendbuild": "vite build --mode frontend"
+        "dev:frontend": "vite --mode frontend",
+        "build:frontend": "vite build --mode frontend"
     },
     "keywords": [],
     "author": "",

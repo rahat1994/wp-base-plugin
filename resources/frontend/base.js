@@ -1,8 +1,7 @@
 import "./base.css";
 import Alpine from "alpinejs";
-import LoveCounter from "./modules/love-counter";
-console.log("Hello there rahat");
-window.Alpine = Alpine;
+import Feed from "./modules/Feed";
 
-Alpine.data("loveCounter", LoveCounter);
+window.Alpine = Alpine;
+Alpine.data("feed", Feed);
 Alpine.start();

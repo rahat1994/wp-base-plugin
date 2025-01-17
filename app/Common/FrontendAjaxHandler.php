@@ -6,7 +6,7 @@ use App\Common\Request;
 use App\Common\Router;
 use App\Interfaces\Commons\ApiHandlerInterface;
 
-class AjaxHandler implements ApiHandlerInterface
+class FrontendAjaxHandler implements ApiHandlerInterface
 {
     public Router $router;
     public string $routesFile = PLUGIN_CONST_DIR . 'routes/routes.php';
@@ -16,9 +16,10 @@ class AjaxHandler implements ApiHandlerInterface
     /**
      * AjaxHandler constructor.
      */
-    public function boot($apiNamespace = 'wp_base_plugin')
+    public function boot($apiNamespace = 'wp_base_plugin_frontend')
     {
         add_action('wp_ajax_' . $apiNamespace, [$this, 'handleRequest']);
+        add_action('wp_ajax_nopriv_' . $apiNamespace, [$this, 'handleRequest']);
     }
 
     public function handleRequest()
@@ -41,7 +42,7 @@ class AjaxHandler implements ApiHandlerInterface
             return;
         }
 
-        if (!wp_verify_nonce($request['nonce'], 'wp-base-plugin-nonce')) {
+        if (!wp_verify_nonce($request['nonce'], 'wp-base-plugin-nonce-frontend')) {
             wp_send_json_error(['message' => 'Error: Nonce error!']);
         }
     }
