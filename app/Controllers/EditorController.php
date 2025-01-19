@@ -3,12 +3,13 @@
 namespace App\Controllers;
 
 if (!defined('ABSPATH')) {
-	exit;
+    exit;
 }
 
-class EditorController {
-
-    public function getFeed(){
+class EditorController
+{
+    public function getFeed()
+    {
         if (!current_user_can('manage_options')) {
             return wp_send_json_error('Unauthorized', 401);
         }
@@ -25,7 +26,8 @@ class EditorController {
         ]);
     }
 
-    public function saveFeedConfig(){
+    public function saveFeedConfig()
+    {
         if (!current_user_can('manage_options')) {
             return wp_send_json_error('Unauthorized', 401);
         }
@@ -45,7 +47,8 @@ class EditorController {
         ]);
     }
 
-    public function getFeedConfig(){
+    public function getFeedConfig()
+    {
         if (!current_user_can('manage_options')) {
             return wp_send_json_error('Unauthorized', 401);
         }
@@ -58,10 +61,10 @@ class EditorController {
             $feed = sanitize_text_field($_GET['feed']);
             $config = get_post_meta($feed, '_wprb_feed_config', true);
 
-            if($config === ''){
+            if ($config === '') {
                 $config = wprb_feed_default_config();
             }
-    
+
             return wp_send_json_success([
                 'success' => true,
                 'feed'    => $feed,

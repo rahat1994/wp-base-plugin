@@ -17,5 +17,8 @@
     ],
     "require": {
         "league/container": "^4.2"
+    },
+    "require-dev": {
+        "rector/rector": "^2.0"
     }
 }

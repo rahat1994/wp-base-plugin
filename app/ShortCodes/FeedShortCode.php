@@ -7,6 +7,7 @@ use App\Common\LoadAssets;
 use App\Traits\CanInteractWithFeedCPT;
 use App\PlatformClients\RedditClient;
 use App\Interfaces\ShortCodes\ShortcodeInterface;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -18,29 +19,34 @@ if (!defined('ABSPATH')) {
 class FeedShortCode implements ShortcodeInterface
 {
     use CanInteractWithFeedCPT;
+
     public RedditClient $redditClient;
     public LoadAssets $assetsLoader;
     public FrontendAjaxHandler $frontendAjaxHandler;
     public array $validators;
 
-    public function __construct(RedditClient $redditClient, LoadAssets $assetsLoadiner, FrontendAjaxHandler $ajaxHandler){
+    public function __construct(RedditClient $redditClient, LoadAssets $assetsLoadiner, FrontendAjaxHandler $ajaxHandler)
+    {
         $this->redditClient = $redditClient;
         $this->assetsLoader = $assetsLoadiner;
         $this->frontendAjaxHandler = $ajaxHandler;
     }
 
-    public function boot(){
+    public function boot()
+    {
         $this->frontendAjaxHandler->boot();
         add_action('wp_enqueue_scripts', [$this, 'loadFrontendScripts']);
         add_shortcode('wprb-subreddit-feed', array($this,'renderFeedWithJS'));
     }
 
-    public function loadFrontendScripts(){
+    public function loadFrontendScripts()
+    {
         $this->assetsLoader->frontend();
         $this->localizeScript();
     }
 
-    public function localizeScript(){
+    public function localizeScript()
+    {
         $translatable = apply_filters('wp-base-plugin/frontend_translatable_strings', array(
             'hello' => __('Hello', 'wp-base-plugin'),
         ));
@@ -57,41 +63,47 @@ class FeedShortCode implements ShortcodeInterface
         wp_localize_script('wp-base-plugin-frontend-script', 'wpBasePluginFrontend', $pluginlowercase);
     }
 
-    public function getShortcodeAttributes($atts, $tag){
+    public function getShortcodeAttributes($atts, $tag)
+    {
         // normalize attribute keys, lowercase
-        $atts = array_change_key_case( (array) $atts, CASE_LOWER );
-        
+        $atts = array_change_key_case((array) $atts, CASE_LOWER);
+
         // override default attributes with user attributes
         return shortcode_atts(
             array(
                 'feed' => null,
-            ), $atts, $tag
+            ),
+            $atts,
+            $tag
         );
     }
-    public function renderFeedWithJS($atts = [], $content = null, $tag = ''){
+    public function renderFeedWithJS($atts = [], $content = null, $tag = '')
+    {
         $shortcodeAtts = $this->getShortcodeAttributes($atts, $tag);
 
-        return '<div x-init="{feedId: 46}"><div x-data="feed" x-init="feedId = '.$shortcodeAtts['feed'].'">
+        return '<div x-init="{feedId: 46}"><div x-data="feed" x-init="feedId = ' . $shortcodeAtts['feed'] . '">
             <span x-html="renderFeed"></span>
         </div></div>';
     }
-    public function render_subreddit_feed($atts = [], $content = null, $tag = ''){
-        
-        
-    
+
+    public function renderSubredditFeed($atts = [], $content = null, $tag = '')
+    {
+
+
+
         $shortcodeAtts = $this->getShortcodeAttributes($atts, $tag);
 
         if ($shortcodeAtts['feed'] == null) {
-            return '<div class="wp-base-notice">'.__('Missing feed attribute', 'wp-base-plugin').'</div>';
+            return '<div class="wp-base-notice">' . __('Missing feed attribute', 'wp-base-plugin') . '</div>';
         }
-        
+
         $rssUrl = $this->getFeedMeta($shortcodeAtts['feed']);
 
-        if(!$rssUrl){
-            return '<div class="wp-base-notice">'.__('Invalid URL', 'wp-base-plugin').'</div>';
+        if (!$rssUrl) {
+            return '<div class="wp-base-notice">' . __('Invalid URL', 'wp-base-plugin') . '</div>';
         }
 
-        
+
         $feedType = $this->getFeedMeta($shortcodeAtts['feed'], '_wprb_feed_type');
         $shouldBeCached = $this->getFeedMeta($shortcodeAtts['feed'], '_wprb_should_be_cached');
 
@@ -99,31 +111,32 @@ class FeedShortCode implements ShortcodeInterface
         $shouldBeCached = $shouldBeCached ? $shouldBeCached : 'true';
         $subRedditName = $this->getSubredditName($rssUrl);
 
-        $subredditData = $this->redditClient->getSubredditHTML($shortcodeAtts['feed'],$subRedditName, $feedType , $shouldBeCached);
+        $subredditData = $this->redditClient->getSubredditHTML($shortcodeAtts['feed'], $subRedditName, $feedType, $shouldBeCached);
 
-        if(!$subredditData){
-            return '<div class="wp-base-plugin">'.__('Something went wrong.', 'wp-base-plugin').'</div>';
+        if (!$subredditData) {
+            return '<div class="wp-base-plugin">' . __('Something went wrong.', 'wp-base-plugin') . '</div>';
         }
 
         $feedData = $subredditData['feedData'];
         $subRedditinfo = $subredditData['subRedditInfo'];
 
-        if(!$feedData){
-            return '<div class="wp-base-plugin">'.__('Invalid access token.', 'wp-base-plugin').'</div>';
+        if (!$feedData) {
+            return '<div class="wp-base-plugin">' . __('Invalid access token.', 'wp-base-plugin') . '</div>';
         }
 
         if (count($feedData['data']['children']) == 0) {
-            return '<div class="wp-base-plugin">'.__('No feed data found', 'wp-base-plugin').'</div>';
+            return '<div class="wp-base-plugin">' . __('No feed data found', 'wp-base-plugin') . '</div>';
         }
 
         $feedConfig = $this->getFeedConfig($shortcodeAtts['feed']);
         $subredditMetaHtml = $this->getSubredditMetaHTML($subRedditinfo, $feedConfig);
-        $links = $this->getFeedLInks($feedData,$feedConfig);
+        $links = $this->getFeedLInks($feedData, $feedConfig);
 
-        return '<div class="wprb-subreddit-posts">'.$subredditMetaHtml.$links.'</div>';
+        return '<div class="wprb-subreddit-posts">' . $subredditMetaHtml . $links . '</div>';
     }
 
-    public function getSubredditMetaHTML($subRedditInfo, $feedConfig){
+    public function getSubredditMetaHTML($subRedditInfo, $feedConfig)
+    {
         $title = $subRedditInfo['data']['title'];
         $description = $subRedditInfo['data']['public_description'];
 
@@ -141,10 +154,11 @@ class FeedShortCode implements ShortcodeInterface
             $descriptionHTML = '<' . esc_html($tag) . ' class="' . esc_attr($classes) . '">' . esc_html($description) . '</' . esc_html($tag) . '>';
         }
 
-        return '<div class="wprb-subreddit-meta">'.$titleHTML.$descriptionHTML.'</div>';
+        return '<div class="wprb-subreddit-meta">' . $titleHTML . $descriptionHTML . '</div>';
     }
 
-    public function getFeedLInks($feedData, $feedConfig){
+    public function getFeedLInks($feedData, $feedConfig)
+    {
 
 
         $links = '';
@@ -170,32 +184,33 @@ class FeedShortCode implements ShortcodeInterface
 
 
 
-    public function getFeedPostById($id){
+    public function getFeedPostById($id)
+    {
         $post = get_post($id);
         return $post;
     }
 
 
 
-    public function getRssUrlContent($url){
+    public function getRssUrlContent($url)
+    {
         error_log($url);
         $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $xmlString = curl_exec($curl);
         curl_close($curl);
 
-        error_log('The xml string: '.$xmlString);
+        error_log('The xml string: ' . $xmlString);
         return $xmlString;
     }
 
-    public function getFeedConfig($feedId){
+    public function getFeedConfig($feedId)
+    {
         $feedConfig = get_post_meta($feedId, '_wprb_feed_config', true);
 
-        if($feedConfig === ''){
+        if ($feedConfig === '') {
             $feedConfig = wprb_feed_default_config();
         }
         return json_decode($feedConfig, true);
     }
-
-
 }

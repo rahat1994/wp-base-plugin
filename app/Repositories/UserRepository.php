@@ -6,7 +6,7 @@ use App\Repositories\BaseRepository;
 
 class UserRepository extends BaseRepository
 {
-    public static function get_users($args = [])
+    public static function getUsers($args = [])
     {
         $default_args = [
             'number' => 10,
@@ -33,7 +33,7 @@ class UserRepository extends BaseRepository
         return $users;
     }
 
-    public function get_user_by_id($user_id)
+    public function getUserById($user_id)
     {
         $user = get_userdata($user_id);
 
@@ -73,7 +73,7 @@ class UserRepository extends BaseRepository
         return null;
     }
 
-    public function get_users_by_meta($meta_key, $meta_value)
+    public function getUsersByMeta($meta_key, $meta_value)
     {
         $args = [
             'meta_key'   => $meta_key,

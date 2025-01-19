@@ -10,41 +10,42 @@ if (!defined('ABSPATH')) {
 
 trait CanInteractWithUsers
 {
-    
-    public function getUsers(int $limit = 10, int $offset = 0, array $filters = []){
-        $users = UserRepository::get_users();
+    public function getUsers(int $limit = 10, int $offset = 0, array $filters = [])
+    {
+        $users = UserRepository::getUsers();
         return $users;
     }
 
-    public function getUserByID($id){
-
+    public function getUserByID($id)
+    {
     }
 
-    public function getUserByEmail($email){
+    public function getUserByEmail($email)
+    {
         return UserRepository::getUserByEmail($email);
     }
 
-    public function createUser($data){
-
+    public function createUser($data)
+    {
     }
 
-    public function updateUser($id, $data){
-
+    public function updateUser($id, $data)
+    {
     }
 
-    public function deleteUser($id){
-
+    public function deleteUser($id)
+    {
     }
 
-    public function getAllUsers(){
+    public function getAllUsers()
+    {
 
         $args = [
             'number' => -1,
             'orderby' => 'ID',
             'order' => 'DESC',
         ];
-        $users = UserRepository::get_users($args);
+        $users = UserRepository::getUsers($args);
         return $users;
     }
-
 }
