@@ -4,20 +4,30 @@ namespace App\Traits;
 
 trait CanValidateInputs
 {
-    public function validateAndSanitize(array $keys)
+    public function validateAndSanitize(array $keys, $notRequired = [])
     {
         $sanitizedData = [];
 
         foreach ($keys as $key => $type) {
-            if (isset($_POST[$key])) {
-                $value = wp_unslash($_POST[$key]);
-            } elseif (isset($_GET[$key])) {
-                $value = wp_unslash($_GET[$key]);
+            if (in_array($key, $notRequired)) {
+                if (isset($_POST[$key])) {
+                    $value = wp_unslash($_POST[$key]);
+                } elseif (isset($_GET[$key])) {
+                    $value = wp_unslash($_GET[$key]);
+                } else {
+                    continue;
+                }
             } else {
-                wp_send_json_error([
-                    'success' => false,
-                    'message' => sprintf(__('The key %s is required!', 'wp-base-plugin'), $key),
-                ], 400);
+                if (isset($_POST[$key])) {
+                    $value = wp_unslash($_POST[$key]);
+                } elseif (isset($_GET[$key])) {
+                    $value = wp_unslash($_GET[$key]);
+                } else {
+                    wp_send_json_error([
+                        'success' => false,
+                        'message' => sprintf(__('The key %s is required!', 'wp-base-plugin'), $key),
+                    ], 400);
+                }
             }
 
             switch ($type) {
