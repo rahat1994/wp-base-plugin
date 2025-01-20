@@ -38,10 +38,12 @@ class FeedController extends BaseController
         $inputs = $this->validateAndSanitize([
             'page' => 'integer',
             'filterTitle' => 'string',
+        ], [
+            'filterTitle',
         ]);
 
         $page = $inputs['page'];
-        $filterTitle = $inputs['filterTitle'];
+        $filterTitle = $inputs['filterTitle'] ? $inputs['filterTitle'] : '';
         try {
 
             $page = isset($page) &&
