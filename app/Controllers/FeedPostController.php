@@ -2,24 +2,28 @@
 
 namespace App\Controllers;
 
+use App\Traits\CanValidateInputs;
+
 if (!defined('ABSPATH')) {
-	exit;
+    exit;
 }
 
-class FeedPostController extends BaseController {
+class FeedPostController extends BaseController
+{
+    use CanValidateInputs;
+    public function index()
+    {
+        $inputs = $this->validateAndSanitize([
+            'feed' => 'string',
+        ]);
 
-    public function index(){
+        $feed = $inputs['feed'];
 
-        if (empty($_GET['feed_id'])) {
-            wp_send_json_error([
-                'success' => false,
-                'feed'    => __('Feed Id are required!', 'wp-base-plugin'),
-            ]);
-        }
+
 
         wp_send_json_success([
             'success' => true,
-            'feed'    => [
+            'feed' => [
                 "Hello",
                 "There"
             ],

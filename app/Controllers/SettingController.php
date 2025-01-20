@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Traits\CanValidateInputs;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -12,36 +14,47 @@ use App\Traits\CanInteractWithSettings;
 class SettingController extends BaseController
 {
     use CanInteractWithSettings;
+    use CanValidateInputs;
     public function index()
     {
+        if (!current_user_can('manage_options')) {
+            return wp_send_json_error('Unauthorized', 401);
+        }
 
-        if (!isset($_GET['settingKeys'])) {
+        $inputs = $this->validateAndSanitize([
+            'settingKeys' => 'string'
+        ]);
+
+        try {
+            $settingKeys = $inputs['settingKeys'];
+            $args = explode(',', $settingKeys);
+
+            $settings = $this->getSettings($args);
+            return wp_send_json_success([
+                'success' => true,
+                'data' => wp_json_encode($settings),
+            ]);
+        } catch (\Throwable $th) {
             wp_send_json_error([
                 'success' => false,
-                'feed'    => 'settingKeys is required!',
-            ]);
+                'message' => $th->getMessage(),
+            ], 400);
         }
-        $settingKeys = sanitize_text_field(wp_unslash($_GET['settingKeys']));
-        $args = explode(',', $settingKeys);
-
-        $settings = $this->getSettings($args);
-        return wp_send_json_success([
-            'success' => true,
-            'data'    => wp_json_encode($settings),
-        ]);
     }
 
     public function store()
     {
-        if (!isset($_POST['settings'])) {
-            wp_send_json_error([
-                'success' => false,
-                'settings'    => 'settings field is required!',
-            ]);
+        if (!current_user_can('manage_options')) {
+            return wp_send_json_error('Unauthorized', 401);
         }
+
+        $input = $this->validateAndSanitize([
+            'settings' => 'string',
+        ]);
+
         try {
-            $settings = wp_unslash($_POST['settings']);
-            $args = json_decode(sanitize_text_field($settings), true);
+            $settings = $input['settings'];
+            $args = json_decode($settings, true);
 
             $settings = $this->getSettings(array_keys($args));
 
@@ -54,7 +67,7 @@ class SettingController extends BaseController
             if ($this->addSettings($args)) {
                 wp_send_json_success([
                     'success' => true,
-                    'settings'    => 'Settings added successfully!',
+                    'settings' => 'Settings added successfully!',
                 ]);
             }
 
@@ -62,7 +75,7 @@ class SettingController extends BaseController
         } catch (\Exception $e) {
             wp_send_json_error([
                 'success' => false,
-                'settings'    => $e->getMessage(),
+                'settings' => $e->getMessage(),
             ]);
         }
     }

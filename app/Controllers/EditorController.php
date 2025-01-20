@@ -2,30 +2,43 @@
 
 namespace App\Controllers;
 
+use App\Traits\CanValidateInputs;
+
 if (!defined('ABSPATH')) {
-	exit;
+    exit;
 }
 
-class EditorController {
+class EditorController
+{
+    use CanValidateInputs;
 
-    public function getFeed(){
+    public function getFeed()
+    {
         if (!current_user_can('manage_options')) {
             return wp_send_json_error('Unauthorized', 401);
         }
 
-        if (!isset($_POST['feed'])) {
-            return wp_send_json_error('Missing feed attribute', 400);
-        }
-
-        $feed = sanitize_text_field($_POST['feed']);
-
-        return wp_send_json_success([
-            'success' => true,
-            'feed'    => $feed,
+        $inputs = $this->validateAndSanitize([
+            'feed' => 'string',
         ]);
+
+        try {
+            $feed = $inputs['feed'];
+
+            return wp_send_json_success([
+                'success' => true,
+                'feed' => $feed,
+            ]);
+        } catch (\Throwable $th) {
+            return wp_send_json_error([
+                'success' => false,
+                'message' => $th->getMessage(),
+            ], 400);
+        }
     }
 
-    public function saveFeedConfig(){
+    public function saveFeedConfig()
+    {
         if (!current_user_can('manage_options')) {
             return wp_send_json_error('Unauthorized', 401);
         }
@@ -34,46 +47,61 @@ class EditorController {
             return wp_send_json_error('Missing field', 400);
         }
 
-        $feed = sanitize_text_field($_POST['feed']);
-        $config = sanitize_text_field($_POST['config']);
-
-        update_post_meta($feed, '_wprb_feed_config', $config);
-
-        return wp_send_json_success([
-            'success' => true,
-            'feed'    => $feed,
+        $inputs = $this->validateAndSanitize([
+            'feed' => 'string',
+            'config' => 'array',
         ]);
+
+        $feed = $inputs['feed'];
+        $config = $inputs['config'];
+
+        try {
+            update_post_meta($feed, '_wprb_feed_config', $config);
+
+            return wp_send_json_success([
+                'success' => true,
+                'feed' => $feed,
+            ]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return wp_send_json_error([
+                'success' => false,
+                'feed' => $feed,
+                'message' => $th->getMessage(),
+            ], 400);
+        }
     }
 
-    public function getFeedConfig(){
+    public function getFeedConfig()
+    {
         if (!current_user_can('manage_options')) {
             return wp_send_json_error('Unauthorized', 401);
         }
 
-        if (!isset($_GET['feed'])) {
-            return wp_send_json_error('Missing feed attribute', 400);
-        }
+        $inputs = $this->validateAndSanitize([
+            'feed' => 'string',
+        ]);
 
         try {
-            $feed = sanitize_text_field($_GET['feed']);
+            $feed = $inputs['feed'];
             $config = get_post_meta($feed, '_wprb_feed_config', true);
 
-            if($config === ''){
+            if ($config === '') {
                 $config = wprb_feed_default_config();
             }
-    
+
             return wp_send_json_success([
                 'success' => true,
-                'feed'    => $feed,
-                'config'  => $config,
-            ]);
+                'feed' => $feed,
+                'config' => $config,
+            ], 200);
         } catch (\Throwable $th) {
             //throw $th;
-            return wp_send_json_success([
+            return wp_send_json_error([
                 'success' => false,
-                'feed'    => $feed,
-                'message'  => $th->getMessage(),
-            ]);
+                'feed' => $feed,
+                'message' => $th->getMessage(),
+            ], 400);
         }
     }
 }

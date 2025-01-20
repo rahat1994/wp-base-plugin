@@ -10,23 +10,25 @@ if (!defined('ABSPATH')) {
 
 use App\Controllers\BaseController;
 
-class UsersController extends BaseController {
+class UsersController extends BaseController
+{
 
     use CanInteractWithUsers;
-    public function index(){
+    public function index()
+    {
 
         try {
             $authors = $this->getAllUsers();
             wp_send_json_success([
                 'success' => true,
-                'users'    => wp_json_encode($authors),
+                'users' => wp_json_encode($authors),
             ]);
         } catch (\Exception $e) {
             wp_send_json_error([
                 'success' => false,
-                'users'    => $e->getMessage(),
-            ]);
+                'users' => $e->getMessage(),
+            ], 400);
         }
     }
-    
+
 }
