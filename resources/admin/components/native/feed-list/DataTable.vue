@@ -52,6 +52,11 @@ const reloadFeeds = () => {
     emit("reloadFeeds");
 };
 
+const newFeedCreated = () => {
+    swal("Success", "Feed created successfully", "success");
+    reloadFeeds();
+};
+
 function handleFormSubmissionSuccess(data) {
     emit("reloadFeeds");
 }
@@ -71,7 +76,7 @@ function filterByTitle() {
                     Search
                 </Button>
             </div>
-            <CreateNewFeed :users="props.users" @reloadFeeds="reloadFeeds" />
+            <CreateNewFeed :users="props.users" @reloadFeeds="newFeedCreated" />
             <Button
                 @click="reloadFeeds"
                 class="bg-blue-500 hover:bg-blue-600"
