@@ -1,9 +1,14 @@
+import "./base.css";
+
 jQuery(document).ready(function ($) {
+    let currentPage = 1;
+
     // Function to fetch data and process it
-    function fetchData() {
+    function fetchData(page = 1) {
         const args = {
             route: "get-feed-posts",
             feed_id: 46,
+            page: page,
         };
 
         const url = buildAjaxGetUrl(args);
@@ -17,25 +22,7 @@ jQuery(document).ready(function ($) {
                 }
                 return response.json();
             })
-            .then((data) => {
-                // Display title and description
-                $("#title").text(data.title);
-                $("#description").text(data.description);
-
-                // Loop through posts and append them to the page
-                const postsContainer = $("#posts-container");
-                postsContainer.empty(); // Clear any existing content
-
-                data.posts.forEach((post) => {
-                    const postElement = $(
-                        `<div class="post">
-                            <h3>${post.text}</h3>
-                            <p>${post.description}</p>
-                        </div>`
-                    );
-                    postsContainer.append(postElement);
-                });
-            })
+            .then((data) => renderSubredditFeed(data.data))
             .catch((error) => {
                 console.error(
                     "There was a problem with the fetch operation:",
@@ -49,6 +36,83 @@ jQuery(document).ready(function ($) {
 
     // Call fetchData on page load
     fetchData();
+
+    // Function to render the subreddit feed
+    function renderSubredditFeed(data) {
+        var config = data.config;
+        var subredditData = data.data;
+        var $feed = $("#wprb-subreddit-feed");
+
+        // Render title if show is true
+        if (config.title.show && currentPage === 1) {
+            var titleTag = config.title.tag;
+            var titleClasses = config.title.classes;
+            var titleHtml = `<${titleTag} class="${titleClasses}">${subredditData.subRedditInfo.title}</${titleTag}>`;
+            $feed.append(titleHtml);
+        }
+
+        // Render description if show is true
+        if (config.description.show && currentPage === 1) {
+            var descriptionTag = config.description.tag;
+            var descriptionClasses = config.description.classes;
+            var descriptionHtml = `<${descriptionTag} class="${descriptionClasses}">${subredditData.subRedditInfo.description}</${descriptionTag}>`;
+            $feed.append(descriptionHtml);
+        }
+
+        // Render posts if list show is true
+        if (config.list.show) {
+            var listTag = config.list.tag;
+            var listClasses = config.list.classes;
+            var $list = $feed.find(
+                `${listTag}${listClasses ? "." + listClasses : ""}`
+            );
+
+            if ($list.length === 0) {
+                $list = $(`<${listTag} class="${listClasses}"></${listTag}>`);
+                $feed.append($list);
+            }
+
+            subredditData.posts.forEach(function (post) {
+                var postHtml = `
+                        <li>
+                            <h2><a href="${post.url}">${post.title}</a></h2>
+                            <p>${new Date(
+                                post.created_utc * 1000
+                            ).toLocaleString()}</p>
+                            <p>${post.score} points | ${
+                    post.num_comments
+                } comments</p>
+                            ${
+                                post.selftext
+                                    ? `<div>${post.selftext.substring(
+                                          0,
+                                          60
+                                      )}...</div>`
+                                    : ""
+                            }
+                        </li>
+                    `;
+                $list.append(postHtml);
+            });
+
+            // Add "Load More" link if it doesn't exist
+            if ($feed.find("#load-more").length === 0) {
+                $feed.append('<a href="#" id="load-more">Load More</a>');
+            }
+
+            // remove the "Load More" link if the post length is less than the 10
+            if (subredditData.posts.length < 10) {
+                $feed.find("#load-more").remove();
+            }
+        }
+    }
+
+    // Event handler for "Load More" link
+    $(document).on("click", "#load-more", function (e) {
+        e.preventDefault();
+        currentPage++;
+        fetchData(currentPage);
+    });
 });
 
 function buildAjaxGetUrl(args, url = "") {

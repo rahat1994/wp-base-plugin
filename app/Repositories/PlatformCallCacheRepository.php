@@ -2,11 +2,13 @@
 
 namespace App\Repositories;
 
-class PlatformCallCacheRepository extends BaseRepository{
+class PlatformCallCacheRepository extends BaseRepository
+{
 
-    public static function getCache($feedId){
+    public static function getCache($feedId)
+    {
         global $wpdb;
-        
+
         $tableName = $wpdb->prefix . 'wp_base_feed_cache';
 
         $currentTime = current_time('mysql');
@@ -14,7 +16,7 @@ class PlatformCallCacheRepository extends BaseRepository{
 
         $result = $wpdb->get_row($sql, ARRAY_A);
 
-        if($result === null){
+        if ($result === null) {
             return false;
         }
 
@@ -22,9 +24,24 @@ class PlatformCallCacheRepository extends BaseRepository{
 
     }
 
-    public static function createCache($feedId, $name, $value, $platform = 'reddit'){
+    public static function getLatestcacheForFeedId($feedId)
+    {
         global $wpdb;
-        
+
+        $tableName = $wpdb->prefix . 'wp_base_feed_cache';
+
+        $sql = $wpdb->prepare("SELECT * FROM $tableName WHERE post_id = %d ORDER BY id DESC LIMIT 1", $feedId);
+
+        $result = $wpdb->get_row($sql, ARRAY_A);
+
+        return $result;
+
+    }
+
+    public static function createCache($feedId, $name, $value, $platform = 'reddit')
+    {
+        global $wpdb;
+
         $tableName = $wpdb->prefix . 'wp_base_feed_cache';
 
         $currentTime = current_time('mysql');
@@ -42,17 +59,19 @@ class PlatformCallCacheRepository extends BaseRepository{
         $wpdb->insert($tableName, $data);
     }
 
-    public static function deleteCache($feedId){
+    public static function deleteCache($feedId)
+    {
         global $wpdb;
-        
+
         $tableName = $wpdb->prefix . 'wp_base_feed_cache';
 
         $wpdb->delete($tableName, ['post_id' => $feedId]);
     }
 
-    public static function getCachesThatAreExpiredOrGoingToExpire($in = 30){
+    public static function getCachesThatAreExpiredOrGoingToExpire($in = 30)
+    {
         global $wpdb;
-        
+
         $tableName = $wpdb->prefix . 'wp_base_feed_cache';
 
         $currentTime = current_time('mysql');
@@ -64,9 +83,10 @@ class PlatformCallCacheRepository extends BaseRepository{
         return $results;
     }
 
-    public static function getCachesThatAreExpired(){
+    public static function getCachesThatAreExpired()
+    {
         global $wpdb;
-        
+
         $tableName = $wpdb->prefix . 'wp_base_feed_cache';
 
         $currentTime = current_time('mysql');

@@ -33,12 +33,12 @@ class FeedShortCode implements ShortcodeInterface
     public function boot()
     {
         $this->frontendAjaxHandler->boot();
-        add_action('wp_enqueue_scripts', [$this, 'loadFrontendScripts']);
         add_shortcode('wprb-subreddit-feed', array($this, 'renderFeedWithJS'));
     }
 
     public function loadFrontendScripts()
     {
+
         $this->assetsLoader->frontend();
         $this->localizeScript();
     }
@@ -49,7 +49,7 @@ class FeedShortCode implements ShortcodeInterface
             'hello' => __('Hello', 'wp-base-plugin'),
         ));
 
-        $pluginlowercase = apply_filters('wp-base-plugin/fronendVars', array(
+        $pluginlowercase = apply_filters('wp-base-plugin/fronend-vars', array(
             'url' => PLUGIN_CONST_URL,
             'assets_url' => PLUGIN_CONST_URL . 'assets/',
             'ajaxurl' => admin_url('admin-ajax.php'),
@@ -77,16 +77,18 @@ class FeedShortCode implements ShortcodeInterface
     }
     public function renderFeedWithJS($atts = [], $content = null, $tag = '')
     {
+        add_action('wp_enqueue_scripts', [$this, 'loadFrontendScripts']);
+
         $shortcodeAtts = $this->getShortcodeAttributes($atts, $tag);
 
-        return '<div id="wprb-subreddit-feed" data-feed="' . esc_attr($shortcodeAtts['feed']) . '">
+        return '<div id="wprb-subreddit-feed-wrapper" data-feed="' . esc_attr($shortcodeAtts['feed']) . '">
+            <div id="wprb-subreddit-feed" clas="wprb-subreddit-feed"></div>
             
+            <div id="error-message"></div>
         </div>';
     }
     public function render_subreddit_feed($atts = [], $content = null, $tag = '')
     {
-
-
 
         $shortcodeAtts = $this->getShortcodeAttributes($atts, $tag);
 
@@ -201,15 +203,7 @@ class FeedShortCode implements ShortcodeInterface
         return $xmlString;
     }
 
-    public function getFeedConfig($feedId)
-    {
-        $feedConfig = get_post_meta($feedId, '_wprb_feed_config', true);
 
-        if ($feedConfig === '') {
-            $feedConfig = wprb_feed_default_config();
-        }
-        return json_decode($feedConfig, true);
-    }
 
 
 }

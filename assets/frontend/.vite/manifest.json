@@ -1,11 +1,13 @@
 {
+  "resources/frontend/base.css": {
+    "file": "css/base.css",
+    "src": "resources/frontend/base.css",
+    "isEntry": true
+  },
   "resources/frontend/base.js": {
     "file": "js/base.js",
     "name": "base",
     "src": "resources/frontend/base.js",
-    "isEntry": true,
-    "css": [
-      "css/base.css"
-    ]
+    "isEntry": true
   }
 }

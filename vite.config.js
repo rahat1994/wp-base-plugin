@@ -24,7 +24,10 @@ export default defineConfig(({ mode = "admin" }) => {
                 emptyOutDir: false, //dont delete the contents of the output directory before each build
                 // https://rollupjs.org/guide/en/#big-list-of-options
                 rollupOptions: {
-                    input: ["resources/frontend/base.js"],
+                    input: [
+                        "resources/frontend/base.js",
+                        "resources/frontend/base.css",
+                    ],
                     output: {
                         chunkFileNames: "js/[name].js",
                         entryFileNames: "js/[name].js",
@@ -43,18 +46,6 @@ export default defineConfig(({ mode = "admin" }) => {
                             return "[name][extname]";
                         },
                     },
-                },
-            },
-            css: {
-                postcss: {
-                    plugins: [tailwind(), autoprefixer()],
-                },
-            },
-            resolve: {
-                alias: {
-                    "@": fileURLToPath(
-                        new URL("./resources/admin", import.meta.url)
-                    ),
                 },
             },
         };

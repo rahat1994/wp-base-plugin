@@ -10,11 +10,12 @@ if (!defined('ABSPATH')) {
 
 trait CanInteractWithFeedCPT
 {
-    
-    public function get(int $limit = 10, int $page = 0, string $titleFilter = '', array $filters = []){
+
+    public function get(int $limit = 10, int $page = 0, string $titleFilter = '', array $filters = [])
+    {
         $args = [
             'posts_per_page' => $limit,
-            'offset' => ($page -1) * $limit,
+            'offset' => ($page - 1) * $limit,
             'orderby' => 'id',
             'order' => 'DESC',
             's' => $titleFilter,
@@ -24,56 +25,75 @@ trait CanInteractWithFeedCPT
         return $posts;
     }
 
-    public function getTotalNumberOfPosts(string $titleFilter = ''){
+    public function getTotalNumberOfPosts(string $titleFilter = '')
+    {
         $total = FeedRepository::getTotalNumberOfPosts($titleFilter);
         return $total;
     }
 
-    public function getByID($id){
+    public function getByID($id)
+    {
         $post = FeedRepository::getPostByID($id);
         return $post;
     }
 
-    public function createFeed($data){
+    public function createFeed($data)
+    {
         return FeedRepository::createPost($data);
-        
+
     }
 
-    public function updateFeed($id, $data){
-       return FeedRepository::updatePost($id, $data);
+    public function updateFeed($id, $data)
+    {
+        return FeedRepository::updatePost($id, $data);
     }
 
-    public function deleteFeedPost($id){
+    public function deleteFeedPost($id)
+    {
         return FeedRepository::deletePost($id);
     }
 
-    public function getAll(){
+    public function getAll()
+    {
 
     }
 
-    public function changeFeedStatus($id, $status = 'publish'){
+    public function changeFeedStatus($id, $status = 'publish')
+    {
         return FeedRepository::changePostStatus($id, $status);
-    }   
+    }
 
     // public function regenerateFeedCache($id){
     //     return FeedRepository::regenerateCache($id);
     // }
 
-    public function getSubredditName($url){
+    public function getSubredditName($url)
+    {
         // ex: https://www.reddit.com/r/ecommerce/
 
         $urlParts = explode('/', $url);
         $subRedditName = $urlParts[count($urlParts) - 2];
 
         return $subRedditName;
-        
+
     }
 
-    public function getFeedMeta(int $id, $meta_key = '_wprb_subreddit_url'){
+    public function getFeedMeta(int $id, $meta_key = '_wprb_subreddit_url')
+    {
 
         $metaValue = get_post_meta($id, $meta_key, true);
 
         return $metaValue;
+    }
+
+    public function getFeedConfig($feedId)
+    {
+        $feedConfig = get_post_meta($feedId, '_wprb_feed_config', true);
+
+        if ($feedConfig === '' || empty($feedConfig) || $feedConfig === null) {
+            $feedConfig = wprb_feed_default_config();
+        }
+        return json_decode($feedConfig, true);
     }
 
 }
