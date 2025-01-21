@@ -1,24 +1,13 @@
-<script>
+<script setup>
+import { ref } from "vue";
 import Separator from "@/components/ui/separator/Separator.vue";
 import SidebarNav from "@/components/partials/SidebarNav.vue";
 import SecretsForm from "@/components/native/settings/SecretsForm.vue";
-export default {
-    name: "Settings",
-    components: {
-        Separator,
-        SidebarNav,
-        SecretsForm,
-    },
-    data() {
-        return {
-            key: "reddit_secrets",
-        };
-    },
-    methods: {
-        updateMessage(key) {
-            this.key = key;
-        },
-    },
+
+const key = ref("reddit_secrets");
+
+const updateMessage = (newKey) => {
+    key.value = newKey;
 };
 </script>
 
@@ -41,6 +30,12 @@ export default {
             <div class="flex-1 lg:max-w-2xl">
                 <div class="space-y-6">
                     <SecretsForm v-if="key === 'reddit_secrets'" />
+                    <p v-if="key === 'data_loading_options'">
+                        Should load data asyncronously
+                    </p>
+                    <p v-if="key === 'reddit_app_name'">
+                        Application name for reddit api
+                    </p>
                 </div>
             </div>
         </div>

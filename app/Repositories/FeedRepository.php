@@ -15,13 +15,13 @@ class FeedRepository extends BaseRepository
 
     public static function getPosts($args = [])
     {
-        
+
         $default_args = [
-            'post_type'      => self::$postType,   // Adjust post type as needed
+            'post_type' => self::$postType,   // Adjust post type as needed
             'posts_per_page' => 10,
-            'orderby'        => 'id',
-            'order'          => 'DESC',
-            'offset'         => 0,
+            'orderby' => 'id',
+            'order' => 'DESC',
+            'offset' => 0,
             's' => '',
         ];
 
@@ -30,17 +30,17 @@ class FeedRepository extends BaseRepository
         $query = new \WP_Query($query_args);
 
         $posts = [];
-        
+
         if ($query->have_posts()) {
             while ($query->have_posts()) {
                 $query->the_post();
                 $publicMetas = self::getAllPublicMetaValuesOfThePost(get_the_ID());
                 $posts[] = array_merge([
-                    'id'     => get_the_ID(),
-                    'title'  => get_the_title(),
+                    'id' => get_the_ID(),
+                    'title' => get_the_title(),
                     'status' => get_post_status(),
                     'author' => get_the_author(),
-                    
+
                 ], $publicMetas);
             }
             wp_reset_postdata();
@@ -49,21 +49,20 @@ class FeedRepository extends BaseRepository
         return $posts;
     }
 
-    public static function getAllPublicMetaValuesOfThePost($id){
+    public static function getAllPublicMetaValuesOfThePost($id)
+    {
         // 'subreddit_url'  => get_post_meta(get_the_ID(), '_wprb_subreddit_url', true),
         $metas = get_post_meta($id);
         $publicMetas = [];
 
         foreach (self::$publicMetas as $value) {
-            if($value === '_wprb_should_be_cached'){
+            if ($value === '_wprb_should_be_cached') {
                 $publicMetas['should_be_cached'] = $metas[$value][0] === 'true' ? true : false;
                 continue;
-            }
-            else if($value === '_wprb_feed_type'){
+            } else if ($value === '_wprb_feed_type') {
                 $publicMetas['feed_type'] = $metas[$value][0];
                 continue;
-            }
-            else if($value === '_wprb_subreddit_url'){
+            } else if ($value === '_wprb_subreddit_url') {
                 $publicMetas['subreddit_url'] = $metas[$value][0];
                 continue;
             }
@@ -75,7 +74,7 @@ class FeedRepository extends BaseRepository
     public static function getPostByID($post_id)
     {
         $args = [
-            'p'         => $post_id,
+            'p' => $post_id,
             'post_type' => self::$postType,
         ];
 
@@ -91,7 +90,7 @@ class FeedRepository extends BaseRepository
         $args = [
             'meta_query' => [
                 [
-                    'key'   => $meta_key,
+                    'key' => $meta_key,
                     'value' => $meta_value,
                 ],
             ],
@@ -103,30 +102,30 @@ class FeedRepository extends BaseRepository
 
     public static function createPost($data)
     {
-        $post_id = wp_insert_post([
-            'post_title'   => $data['post_title'],
-            'post_status'  => 'publish',
-            'post_type'    => self::$postType,
+        $postId = wp_insert_post([
+            'post_title' => $data['post_title'],
+            'post_status' => 'publish',
+            'post_type' => self::$postType,
         ]);
 
-        if ($post_id) {
+        if ($postId) {
             if (isset($data['meta']) && is_array($data['meta'])) {
                 foreach ($data['meta'] as $key => $value) {
-                    update_post_meta($post_id, $key, $value);
+                    update_post_meta($postId, $key, $value);
                 }
             }
         }
 
-        return $post_id;
+        return $postId;
     }
 
     public static function updatePost($post_id, $data)
     {
         $post_id = wp_update_post([
-            'ID'           => $post_id,
-            'post_title'   => $data['post_title'],
-            'post_status'  => 'publish',
-            
+            'ID' => $post_id,
+            'post_title' => $data['post_title'],
+            'post_status' => 'publish',
+
         ]);
 
         if ($post_id) {
@@ -143,9 +142,9 @@ class FeedRepository extends BaseRepository
     public static function getTotalNumberOfPosts(string $titleFilter = '')
     {
         $query = new \WP_Query([
-            'post_type'      => self::$postType,
+            'post_type' => self::$postType,
             'posts_per_page' => -1,
-            's' =>$titleFilter
+            's' => $titleFilter
         ]);
 
         return $query->found_posts;
@@ -156,7 +155,8 @@ class FeedRepository extends BaseRepository
         return wp_delete_post($post_id, true);
     }
 
-    public static function changePostStatus($post_id, $status)  {
+    public static function changePostStatus($post_id, $status)
+    {
         return wp_update_post([
             'ID' => $post_id,
             'post_status' => $status,

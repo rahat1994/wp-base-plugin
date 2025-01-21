@@ -40,7 +40,6 @@ trait CanInteractWithFeedCPT
     public function createFeed($data)
     {
         return FeedRepository::createPost($data);
-
     }
 
     public function updateFeed($id, $data)

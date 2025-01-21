@@ -26,24 +26,30 @@ class PlatformCallCron
     public function boot()
     {
         add_action('wp_base_plugin_platform_call_cron', [$this, 'platformCallCron']);
-        if ( ! wp_next_scheduled( 'wp_base_plugin_platform_call_cron' ) ) {
-            wp_schedule_event( time(), 'hourly', 'wp_base_plugin_platform_call_cron' );
+        if (!wp_next_scheduled('wp_base_plugin_platform_call_cron')) {
+            wp_schedule_event(time(), 'hourly', 'wp_base_plugin_platform_call_cron');
         }
     }
 
     public function platformCallCron()
     {
         try {
-            $feedIds = PlatformCallCacheRepository::getCachesThatAreExpired();
-            $feedIdsAlreadyInQueue = $this->getCacheRegenerationFeedIds();
-            $feedIds = array_unique(array_merge($feedIds, $feedIdsAlreadyInQueue));
+            $feedIds = PlatformCallCacheRepository::getCachesThatAreExpired() ?: [];
+            $feedIdsAlreadyInQueue = $this->getCacheRegenerationFeedIds() ?: [];
+
+            $onlyFeedIds = array_map(function ($feed) {
+                return $feed['post_id'];
+            }, array_values($feedIds));
+            error_log(wp_json_encode($onlyFeedIds));
+
+            $feedIds = array_unique(array_merge((array) $onlyFeedIds, (array) $feedIdsAlreadyInQueue));
             $this->setCacheRegenerationFeedIds($feedIds);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             //throw $th;
             error_log($e);
             $this->setCacheRegenerationCronErrorOption($e->getMessage());
         }
-        
+
     }
 
 

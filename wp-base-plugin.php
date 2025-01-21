@@ -39,8 +39,10 @@ class WpBasePlugin
     public array $shortCodes = [];
     public array $settingsPages = [];
 
+    public array $eventHandlers = [];
+
     public array $crons = [];
-    
+
     public function __construct(AjaxHandler $apiHandler, LoadAssets $assetsLoader, PluginActivator $pluginActivator, PluginDeactivator $pluginDeactivator)
     {
         $this->apiHandler = $apiHandler;
@@ -59,40 +61,59 @@ class WpBasePlugin
         $this->registerCPT();
         $this->renderMenu();
         $this->registerCrons();
+        $this->registerEventHandlers();
         $this->deactivatePlugin();
     }
 
-    public function registerCPT(){
-        foreach($this->CPTS as $cpt){
-            if($cpt instanceof CPTInterface){
+    public function registerCPT()
+    {
+        foreach ($this->CPTS as $cpt) {
+            if ($cpt instanceof CPTInterface) {
                 $cpt->boot();
             }
         }
     }
-    public function registerShortCodes() {
-        foreach($this->shortCodes as $shortCode){
+    public function registerShortCodes()
+    {
+        foreach ($this->shortCodes as $shortCode) {
             if ($shortCode instanceof ShortcodeInterface) {
                 $shortCode->boot();
             }
         }
     }
 
-    public function registerCrons(){
-        foreach($this->crons as $cron){
+    public function registerCrons()
+    {
+        foreach ($this->crons as $cron) {
             $cron->boot();
         }
     }
 
-    public function setShortCodes($shortCodes){
+    public function registerEventHandlers()
+    {
+        foreach ($this->eventHandlers as $handler) {
+            $handler->boot();
+        }
+    }
+
+    public function setShortCodes($shortCodes)
+    {
         $this->shortCodes = $shortCodes;
     }
 
-    public function setCrons($crons){
+    public function setCrons($crons)
+    {
         $this->crons = $crons;
     }
 
-    public function registerSettingsPages() {
-        foreach($this->settingsPages as $page){
+    public function setEventHandlers($eventHandlers)
+    {
+        $this->eventHandlers = $eventHandlers;
+    }
+
+    public function registerSettingsPages()
+    {
+        foreach ($this->settingsPages as $page) {
             $page->boot();
         }
     }
@@ -109,17 +130,18 @@ class WpBasePlugin
         });
     }
 
-    public function deactivatePlugin(){
-        register_deactivation_hook(__FILE__, function($networkWide){
+    public function deactivatePlugin()
+    {
+        register_deactivation_hook(__FILE__, function ($networkWide) {
             $this->pluginDeactivator->deactivate();
         });
     }
 
     public function registerApiRoutes()
     {
-        
+
         $this->apiHandler->boot();
-        
+
     }
 
     public function renderMenu()
@@ -163,8 +185,8 @@ class WpBasePlugin
             'url' => PLUGIN_CONST_URL,
             'assets_url' => PLUGIN_CONST_URL . 'assets/',
             'ajaxurl' => admin_url('admin-ajax.php'),
-            'action'        => 'wp_base_plugin',
-            'nonce'         => wp_create_nonce('wp-base-plugin-nonce'),
+            'action' => 'wp_base_plugin',
+            'nonce' => wp_create_nonce('wp-base-plugin-nonce'),
             'i18n' => $translatable
         ));
 
@@ -180,5 +202,5 @@ class WpBasePlugin
 }
 
 $container = ServiceContainer::getInstance()->getContainer();
-$wpBasePlugin  = $container->get(WpBasePlugin::class);
+$wpBasePlugin = $container->get(WpBasePlugin::class);
 $wpBasePlugin->boot();

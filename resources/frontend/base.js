@@ -1,13 +1,16 @@
 import "./base.css";
 
 jQuery(document).ready(function ($) {
+    var feedWrapper = $(document).find("#wprb-subreddit-feed-wrapper");
+    var feedId = feedWrapper.data("feed");
+
     let currentPage = 1;
 
     // Function to fetch data and process it
     function fetchData(page = 1) {
         const args = {
             route: "get-feed-posts",
-            feed_id: 46,
+            feed_id: feedId,
             page: page,
         };
 
@@ -43,8 +46,11 @@ jQuery(document).ready(function ($) {
         var subredditData = data.data;
         var $feed = $("#wprb-subreddit-feed");
 
-        // Render title if show is true
-        if (config.title.show && currentPage === 1) {
+        if (
+            config.title.show &&
+            currentPage === 1 &&
+            subredditData.subRedditInfo.title !== null
+        ) {
             var titleTag = config.title.tag;
             var titleClasses = config.title.classes;
             var titleHtml = `<${titleTag} class="${titleClasses}">${subredditData.subRedditInfo.title}</${titleTag}>`;
@@ -52,7 +58,11 @@ jQuery(document).ready(function ($) {
         }
 
         // Render description if show is true
-        if (config.description.show && currentPage === 1) {
+        if (
+            config.description.show &&
+            currentPage === 1 &&
+            subredditData.subRedditInfo.description !== null
+        ) {
             var descriptionTag = config.description.tag;
             var descriptionClasses = config.description.classes;
             var descriptionHtml = `<${descriptionTag} class="${descriptionClasses}">${subredditData.subRedditInfo.description}</${descriptionTag}>`;
@@ -68,14 +78,18 @@ jQuery(document).ready(function ($) {
             );
 
             if ($list.length === 0) {
-                $list = $(`<${listTag} class="${listClasses}"></${listTag}>`);
+                $list = $(`<span>No posts found</span>`);
                 $feed.append($list);
             }
 
             subredditData.posts.forEach(function (post) {
-                var postHtml = `
+                var postHtml = `<div class="wprb-post">
                         <li>
-                            <h2><a href="${post.url}">${post.title}</a></h2>
+                            <${config.title.tag} class="${
+                    config.title.classes
+                }">
+                                <a href="${post.url}">${post.title}</a>
+                            </${config.title.tag}>
                             <p>${new Date(
                                 post.created_utc * 1000
                             ).toLocaleString()}</p>
@@ -90,7 +104,7 @@ jQuery(document).ready(function ($) {
                                       )}...</div>`
                                     : ""
                             }
-                        </li>
+                       </li></div>
                     `;
                 $list.append(postHtml);
             });

@@ -90,7 +90,7 @@ class PlatformCallCacheRepository extends BaseRepository
         $tableName = $wpdb->prefix . 'wp_base_feed_cache';
 
         $currentTime = current_time('mysql');
-        $sql = $wpdb->prepare("SELECT post_id FROM $tableName WHERE expiration < %s", $currentTime);
+        $sql = $wpdb->prepare("SELECT post_id FROM $tableName WHERE expiration < %s GROUP BY post_id ORDER BY MAX(id) DESC", $currentTime);
 
         $results = $wpdb->get_results($sql, ARRAY_A);
 

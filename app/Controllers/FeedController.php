@@ -43,7 +43,7 @@ class FeedController extends BaseController
         ]);
 
         $page = $inputs['page'];
-        $filterTitle = $inputs['filterTitle'] ? $inputs['filterTitle'] : '';
+        $filterTitle = $inputs['filterTitle'] ?? '';
         try {
 
             $page = isset($page) &&
@@ -117,15 +117,15 @@ class FeedController extends BaseController
                 ]
             ];
 
-            $feed = $this->createFeed($data);
+            $feedId = $this->createFeed($data);
 
-            if (!$feed) {
+            if (!$feedId) {
                 wp_send_json_error([
                     'success' => false,
                     'feed' => __('Feed could not be created!', 'wp-base-plugin'),
                 ], 400);
             }
-
+            do_action('wp_base_plugin/feed_created', $feedId);
             wp_send_json_success([
                 'success' => true,
                 'feed' => __('Feed edited successfully!', 'wp-base-plugin'),

@@ -19,6 +19,16 @@ const sidebarNavItems = [
         key: "reddit_secrets",
         icon: "reddit",
     },
+    {
+        title: "Data loading options",
+        key: "data_loading_options",
+        icon: "data_loading_options",
+    },
+    {
+        title: "Reddit App Name",
+        key: "reddit_app_name",
+        icon: "reddit_app_name",
+    },
 ];
 </script>
 

@@ -26,6 +26,7 @@ class RedditClient
         if ($shouldBeCached || $shouldBeCached === 'true') {
             error_log('Cached');
             $cachedData = PlatformCallCacheRepository::getCache($feedId);
+            error_log("get cached");
             error_log(wp_json_encode($cachedData));
         } else {
             error_log('Not cached');
@@ -37,13 +38,24 @@ class RedditClient
         if (!$cachedData || empty($cachedData) || count($cachedData) === 0) {
 
             $accessToken = $this->getAccessToken();
-
+            error_log("Access token");
+            error_log($accessToken);
             if (!$accessToken) {
                 return false;
             }
 
-            $data = $this->makeDataCall($subRedditName, $feedType, $accessToken);
 
+            $data = $this->makeDataCall($subRedditName, $feedType, $accessToken);
+            error_log(
+                "Data"
+            );
+            error_log(wp_json_encode($data));
+
+            if (!$data['feedData']['error'] === 400) {
+                error_log("Error in feed data");
+                do_action('wp_base_plugin/feed_error', $feedId, $data);
+                return false;
+            }
 
             if ($shouldBeCached || $shouldBeCached === 'true') {
                 PlatformCallCacheRepository::createCache($feedId, 'feedData', wp_json_encode($data));

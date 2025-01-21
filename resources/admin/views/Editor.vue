@@ -153,8 +153,10 @@ onMounted(() => {
                     @update:config="updateConfig"
                     @save="saveConfig"
                 />
-                <div class="md:order-1 p-4">
-                    <div class="flex h-full flex-col space-y-4">
+                <div class="md:order-1">
+                    <div
+                        class="flex h-full flex-col space-y-4 bg-slate-100 p-4"
+                    >
                         <component
                             :is="state.config.title.tag"
                             v-if="state.config.title.show"

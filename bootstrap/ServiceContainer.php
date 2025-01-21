@@ -8,6 +8,7 @@ use App\Common\Router;
 use App\CPT\FeedCPT;
 use App\Cron\PlatformCallCron;
 use App\Cron\SingleFeedCacheRegenerationCron;
+use App\Handlers\FeedCreationEventHandler;
 use App\Interfaces\Commons\ApiHandlerInterface;
 use App\Interfaces\Commons\AssetsLoaderInterface;
 use App\PlatformClients\RedditClient;
@@ -36,11 +37,14 @@ class ServiceContainer
         $this->container->add(PlatformCallCron::class);
         $this->container->add(SingleFeedCacheRegenerationCron::class)
             ->addArgument(RedditClient::class);
+        $this->container->add(FeedCreationEventHandler::class)
+            ->addArgument(RedditClient::class);
         $this->container->add(PluginDeactivator::class);
         $this->container->add(WpBasePlugin::class)
             ->addArguments([AjaxHandler::class, LoadAssets::class, PluginActivator::class, PluginDeactivator::class])
             ->addMethodCall('setShortCodes', [$this->getShortCodes()])
-            ->addMethodCall('setCrons', [$this->getCrons()]);
+            ->addMethodCall('setCrons', [$this->getCrons()])
+            ->addMethodCall('setEventHandlers', [$this->getHandlers()]);
         $this->container->add(FeedCPT::class);
         $this->container->add(UrlValidator::class);
         $this->container->add(RegexValidator::class);
@@ -73,16 +77,25 @@ class ServiceContainer
     //     ];
     // }
 
-    public function getShortCodes(){
+    public function getShortCodes()
+    {
         return [
             $this->container->get(FeedShortCode::class)
         ];
     }
 
-    public function getCrons(){
+    public function getCrons()
+    {
         return [
             $this->container->get(PlatformCallCron::class),
             $this->container->get(SingleFeedCacheRegenerationCron::class)
+        ];
+    }
+
+    public function getHandlers()
+    {
+        return [
+            $this->container->get(FeedCreationEventHandler::class)
         ];
     }
 

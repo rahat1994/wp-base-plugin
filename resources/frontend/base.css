@@ -3,59 +3,47 @@
     margin: 20px;
     padding: 20px;
 }
+#wprb-subreddit-feed .wprb-list {
+    margin: 0;
+    padding: 0;
+}
+#wprb-subreddit-feed h1 {
+    font-size: 2em;
+    color: #333;
+}
+
+#wprb-subreddit-feed h2 {
+    font-size: 1.75em;
+    color: #333;
+}
+
+#wprb-subreddit-feed h3 {
+    font-size: 1.5em;
+    color: #333;
+}
+
+#wprb-subreddit-feed h4 {
+    font-size: 1.25em;
+    color: #333;
+}
+
+#wprb-subreddit-feed h5 {
+    font-size: 1em;
+    color: #333;
+}
+
+#wprb-subreddit-feed h6 {
+    font-size: 0.875em;
+    color: #333;
+}
 
 #wprb-subreddit-feed li {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    list-style-position: inside;
-}
-
-#wprb-subreddit-feed h1.wp-base-header {
-    color: #24a0ed;
-    font-size: 24px;
-    margin-bottom: 10px;
-}
-
-#wprb-subreddit-feed p {
-    font-size: 16px;
-    line-height: 1.5;
-    margin-bottom: 20px;
-}
-
-#wprb-subreddit-feed ol {
-    list-style-type: decimal;
-    padding-left: 20px;
-}
-
-#wprb-subreddit-feed ol li {
-    margin-bottom: 20px;
+    margin: 10px 0;
     padding: 10px;
-    border-bottom: 1px solid #ddd;
 }
-
-#wprb-subreddit-feed ol li h2 {
-    font-size: 20px;
-    margin-bottom: 5px;
-}
-
-#wprb-subreddit-feed ol li h2 a {
-    color: #24a0ed;
-    text-decoration: none;
-}
-
-#wprb-subreddit-feed ol li h2 a:hover {
-    text-decoration: underline;
-}
-
-#wprb-subreddit-feed ol li p {
-    color: #555;
-}
-
-#wprb-subreddit-feed ol li div {
-    margin-top: 10px;
+#wprb-subreddit-feed .wprb-post {
+    border-bottom: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 10px 0;
     padding: 10px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 4px;
 }
