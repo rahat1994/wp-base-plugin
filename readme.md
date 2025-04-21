@@ -1,4 +1,4 @@
-# WP Base Plugin
+# WP Base Plugin: Get subreddit feeds on your wp site.
 
 WP Base Plugin is a WordPress plugin that relies on Vite, Vue, and Composer. This plugin provides a modern development environment for building WordPress plugins with the latest web technologies.
 
