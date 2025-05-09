@@ -133,7 +133,7 @@ class WpBasePlugin
     public function deactivatePlugin()
     {
         register_deactivation_hook(__FILE__, function ($networkWide) {
-            $this->pluginDeactivator->deactivate();
+            $this->pluginDeactivator->deactivate($networkWide);
         });
     }
 
